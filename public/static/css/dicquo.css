@@ -1,0 +1,134 @@
+@charset "utf-8";
+
+.tags{
+  color: silver;
+  font-size:1.5vh;
+  line-height:1.9vh;
+  padding-top: 7vh;
+}
+
+/*****************************************************************
+ * Настройки для анимирования цвета ссылок:
+ * рецепт взят из: https://habr.com/ru/company/ruvds/blog/491702/
+ *****************************************************************/
+.tags a {
+  text-decoration: none;
+  position: relative;
+  padding: 0 0.5ex;
+  display: inline-block;
+  color: white;
+  border-bottom: dotted 1px silver;
+  /* градиент для цвета ссылки */
+  background: linear-gradient(to right, rgba(255,255,255,0.9) 40%, slategray, silver, lightyellow 50%, rgba(255,255,255,0.4));
+  /*  обрезка градиента */
+  background-clip: initial;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 250% 100%;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+  background-position: 100%;
+  /* плавное позиионирование градиента */
+  transition: background-position 0.65s ease;
+  margin-right: 2vh;
+}
+
+.tags a:hover {
+  color: white;
+  background-position: 0 100%;
+  border-bottom: solid 1px white;
+}
+
+div[name="cookies_accept"] {
+  font-family:'Roboto', 'Lucida Grande', Verdana, Arial, sans-serif;
+  position:fixed;
+  bottom: 0; left: 0;
+  width: 100%;
+  padding: 2vh 2vw;
+  color: black;
+  background-color: gray;
+  text-align: center;
+}
+
+div[name="cookies_accept"] button {
+  padding:0.5vh 0.5vw;
+  background: silver;
+  color: black;
+  margin-left: 2vw;
+  cursor: pointer;
+}
+
+#logo {
+  margin-top:1vh;
+  filter: alpha(Opacity=75); /* Полупрозрачность для IE */
+  opacity: 0.75;
+  float: left;
+}
+
+#logo a {
+  border: none;
+  text-decoration: none;
+}
+
+table { width: 80%; }
+
+#menu {
+  display: none;
+  color: silver;
+}
+
+#mm {
+  text-decoration: none;
+  color: silver;
+}
+
+#image {
+  width: 30vw;
+  text-align: center;
+  vertical-align: center;
+}
+
+#image > center > div {
+  width: 22vw;
+  height: 22vw;
+  padding:0.5vw;
+  border-radius: 50%;
+}
+
+#image > center > div > div {
+  border-radius:50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#image > center > div > div > img {
+  width: auto;
+  height: 22vw;
+}
+
+#author {
+  color: silver;
+  font-size: 3.5vh;
+  line-height: 4vh;
+  text-align: right;
+  padding-top: 4vh;
+  font-style: italic;
+}
+
+#info {
+  color: silver;
+  font-size: 2.5vh;
+  line-height: 3vh;
+  padding-bottom: 2vh;
+}
+
+#bb {
+  color: whitesmoke;
+  font-size: 4.5vh;
+  line-height: 5vh
+}
+
+#next { float: right; }
+
+#next a { border-bottom: none; }

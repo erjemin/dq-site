@@ -1,0 +1,7 @@
+# DicQuo
+User-Agent: *
+Allow: /
+Disallow:
+Host: dq.cube2.ru
+Sitemap: https://dq.cube2.ru/sitemap.xml
+

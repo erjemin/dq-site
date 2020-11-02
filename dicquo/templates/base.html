@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-language" content="ru" />
+  <meta http-equiv="Date" content="{% block Date4Meta %}{% now 'c' %}{% endblock %}" />
+  <meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% now 'c' %}{% endblock %}" />
+  <meta http-equiv="Expires" content="{% block Expires4Meta %}{% now 'c' %}{% endblock %}" />
+  <meta name="GENERATOR" content="Microsoft FrontPage 1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="{% block Description %}{% endblock %}" />
+  <meta name="keywords" content="{% block Keywords %}{% endblock %}" />
+  <meta name="copyright" lang="ru" content="Sergei Erjemin (дизайн){% block CopyrightAuthor4Meta %}{% endblock %}." />
+  <meta name="robots" content="index,follow" />
+  <meta name="document-state" content="{{ META_DOCUMENT_STATE|default:'Dynamic' }}" />
+  <meta name="generator" content="FAVICON -- 0.01β by Python/Django" />
+  <title>{% block Title %}{% endblock %}</title>
+  <!-- Favicons -->
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" sizes="120x120">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" sizes="120x120">
+  <link rel="stylesheet" href="{% static 'css/dicquo.css' %}">
+</head>
+<body style="background: rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %});
+             background: -webkit-linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
+             background: linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));">{% block BODY %}
+  {% block Top_JS1 %}{% endblock %}{% block Top_JS2 %}{% endblock %}{% block Top_JS3 %}{% endblock %}
+  {% block Top_CSS1 %}{% endblock %}{% block Top_CSS2 %}{% endblock %}{% block Top_CSS3 %}{% endblock %}
+  {% block CONTENT %}{% endblock %}
+{% endblock %}
+</body>
+</html>

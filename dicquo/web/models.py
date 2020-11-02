@@ -1,0 +1,416 @@
+# -*- coding: utf-8 -*-
+from django.db import models
+from taggit.managers import TaggableManager
+from taggit.models import Tag, TaggedItem
+from typus import en_typus, ru_typus
+from pathlib import Path
+import urllib3
+import json
+import pytils
+
+
+# класс для транслитерации русскоязычных slug
+# рецепт взят отсюда: https://timonweb.com/django/russian-slugs-for-django-taggit/
+class RuTag(Tag):
+    class Meta:
+        proxy = True
+
+    def slugify(self, tag, i=None):
+        return pytils.translit.slugify(self.name.lower())[:128]
+
+
+class RuTaggedItem(TaggedItem):
+    class Meta:
+        proxy = True
+
+    @classmethod
+    def tag_model(cls):
+        return RuTag
+
+
+class TbImages(models.Model):
+    # ============================================================
+    # ТАБЛИЦА TbImages -- Изображения
+    # ------------------------------------------------------------
+    # | id              -- id | INT(11) | PRIMARY KEY
+    # | imFile          -- Картинка | varchar(128) NOT NULL
+    # | szCaption       -- Заголовок, подпись под картинкой | varchar(136) NULL
+    # | bIsChecked      -- Проверен | tinyint(1) NOT NULL
+    # | iViewCounter    -- Просмотры | int(10) UNSIGNED NOT NULL
+    # | dtCreated       -- Дата создания | datetime(6) NOT NULL
+    # | dtEdited        -- Дата проверки | datetime(6) NOT NULL
+    # ============================================================
+    imFile = models.ImageField(
+        max_length=136,
+        upload_to="img2",
+        default=u"",
+        unique=True,
+        db_index=True,
+        verbose_name=u"Картинка",
+        help_text=u"Файл с картинкой (gif, jpeg, png, bmp)."
+    )
+    szCaption = models.CharField(
+        max_length=128,
+        default=u"",
+        unique=True,
+        db_index=True,
+        blank=False,
+        verbose_name=u"Название",
+        help_text=u"Название, подпись, описание что изображено…"
+    )
+    tags = TaggableManager(
+        blank=True,
+        through=RuTaggedItem,
+        verbose_name=u"Теги",
+        help_text=u"Теги через запятую… Регистр не чувствителен… <b>Теги нужны для подстановки картинок и навигации<b>"
+    )
+    bIsChecked = models.BooleanField(
+        default=True,
+        db_index=True,
+        verbose_name=u"Проверен",
+        help_text=u"Картинку проверили."
+    )
+    iViewCounter = models.PositiveIntegerField(
+        default=0,
+        verbose_name=u"◉",
+        help_text=u"Число просмотров картинки."
+    )
+    dtCreated = models.DateTimeField(
+        db_index=True,
+        auto_now_add=True,  # надо указать False при миграции, после вернуть в True
+        auto_now=False,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после убрать (она не нужна)
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата создания"
+    )
+    dtEdited = models.DateTimeField(
+        db_index=True,
+        auto_now=True,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после она не нужна
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата редактирования"
+    )
+
+    def __str__(self):
+        filename = self.imFile.name
+        if len(filename) > 15:
+            filename = filename[:15] + u"…"
+        caption = self.szCaption
+        if len(caption) > 25:
+            caption = caption[:25] + u"…"
+        caption = "%d×%d - %s" % (self.imFile.width, self.imFile.height, caption)
+        return u"%05d: %s (%s)" % (self.id, filename, caption)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    # заменим имя файла картинки
+    def save(self, *args, **kwargs):
+        self.imFile.name = pytils.translit.slugify(self.szCaption.lower()) + str(Path(self.imFile.name).suffixes)
+        super(TbImages, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = u"КАРТИНКА"
+        verbose_name_plural = u"КАРТИНКИ"
+        ordering = ['id', ]
+
+
+class TbOrigin(models.Model):
+    # ============================================================
+    # ТАБЛИЦА TbOrigin -- Источник, место откуда взята циатата, высказывание, изречение
+    # ------------------------------------------------------------
+    # | id              -- id | INT(11) | PRIMARY KEY
+    # | szOrigin        -- Источник | varchar(256) NULL
+    # | dtCreated       -- Дата создания | datetime(6) NOT NULL
+    # | dtEdited        -- Дата проверки | datetime(6) NOT NULL
+    # ============================================================
+    szOrigin = models.CharField(
+        max_length=256,
+        default=u"",
+        unique=True,
+        db_index=True,
+        verbose_name=u"Источник",
+        help_text=u"Ссылка или указание источника: книга, URL, просто что-то…"
+    )
+    dtCreated = models.DateTimeField(
+        db_index=True,
+        auto_now_add=True,  # надо указать False при миграции, после вернуть в True
+        auto_now=False,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после убрать (она не нужна)
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата создания"
+    )
+    dtEdited = models.DateTimeField(
+        db_index=True,
+        auto_now=True,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после она не нужна
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата редактирования"
+    )
+
+    def __str__(self):
+        origin = self.szOrigin
+        if len(origin) > 35:
+            origin = origin[:35] + u"…"
+        return u"%03d: %s" % (self.id, origin)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    class Meta:
+        verbose_name = u"ИСТОЧНИК"
+        verbose_name_plural = u"ИСТОЧНИКИ"
+        ordering = ['id', ]
+
+
+class TbAuthor(models.Model):
+    # ============================================================
+    # ТАБЛИЦА TbAuthor -- Автор изречения или цитаты (dictum and quotes)
+    # ------------------------------------------------------------
+    # | id              -- id | INT(11) | PRIMARY KEY
+    # | szAuthor        -- Автор и, если необходимо, краткая справка | varchar(256) NOT NULL
+    # | szAuthorHTML    -- Автор и... в HTML по правилам типографики | varchar(136) NULL
+    # | bIsChecked      -- Проверен | tinyint(1) NOT NULL
+    # | iViewCounter    -- Просмотры | int(10) UNSIGNED NOT NULL
+    # | dtCreated       -- Дата создания | datetime(6) NOT NULL
+    # | dtEdited        -- Дата проверки | datetime(6) NOT NULL
+    # ============================================================
+    szAuthor = models.CharField(
+        max_length=128,
+        default=u"",
+        unique=True,
+        db_index=True,
+        verbose_name=u"Автор",
+        help_text=u"Автор и, если необходимо, краткая справка"
+    )
+    szAuthorHTML = models.TextField(
+        default="",
+        blank=True,
+        verbose_name=u"Автор HTML",
+        help_text=u"Автор и, если необходимо, краткая справка<br />"
+                  u"Свертано в HTML по правилам типографики <small>(рекламные URL вставляются тут)</small>"
+    )
+    bIsChecked = models.BooleanField(
+        default=True,
+        db_index=True,
+        verbose_name=u"Проверен",
+        help_text=u"Автор проверен."
+    )
+    tags = TaggableManager(
+        blank=True,
+        through=RuTaggedItem,
+        verbose_name=u"Теги",
+        help_text=u"Теги через запятую… Регистр не чувствителен… <b>Теги нужны для подстановки картинок и навигации<b>"
+    )
+    iViewCounter = models.PositiveIntegerField(
+        default=0,
+        verbose_name=u"◉",
+        help_text=u"Число просмотров Автора."
+    )
+    dtCreated = models.DateTimeField(
+        db_index=True,
+        auto_now_add=True,  # надо указать False при миграции, после вернуть в True
+        auto_now=False,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после убрать (она не нужна)
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата создания"
+    )
+    dtEdited = models.DateTimeField(
+        db_index=True,
+        auto_now=True,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после она не нужна
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата редактирования"
+    )
+
+    def __str__(self):
+        author = self.szAuthor
+        if len(author) > 25:
+            author = author[:25] + u"…"
+        return u"%04d: %s" % (self.id, author)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def save(self, *args, **kwargs):
+        http = urllib3.PoolManager()
+        # последовательно
+        # Используем типограф typus (https://github.com/byashimov/typus)
+        # Используем типограф Eugene Spearance (http://www.typograf.ru/)
+        # Используем типограф Муравьева (http://mdash.ru/api.v1.php)
+        self.szAuthor = ru_typus(self.szAuthor)
+        resp = http.request("POST",
+                            "http://www.typograf.ru/webservice/",
+                            fields={"text": self.szAuthor.encode('cp1251')})
+        self.szAuthorHTML = resp.data.decode('cp1251')
+        # print(self.szContentHTML)
+        resp = http.request("POST",
+                            "http://mdash.ru/api.v1.php",
+                            fields={"text": self.szAuthorHTML.encode('utf-8')})
+        self.szAuthorHTML = json.loads(resp.data)["result"]
+        # print(self.szContentHTML)
+        super(TbAuthor, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = u"АВТОР"
+        verbose_name_plural = u"АВТОРЫ"
+        ordering = ['id', ]
+
+
+class TbDictumAndQuotes(models.Model):
+    # ============================================================
+    # ТАБЛИЦА TbDictQuot -- Изречения и Цитаты (dictum and quotes)
+    # ------------------------------------------------------------
+    # | id              -- id | INT(11) | PRIMARY KEY
+    # | szIntro         -- Вступление | varchar(256) NULL
+    # | szIntroHTML     -- Вступление | (форматированное в HTML) varchar(136) NULL
+    # | szContent       -- Высказывание | varchar(136)  NOT NULL
+    # | szContentHtml   -- Высказывание (Сформатированнон в HTML) | varchar(136) NULL
+    # | bIsChecked      -- Проверен | tinyint(1) NOT NULL
+    # | kImages         -- Ссылка на картинку в таблице TbImages |
+    # | iViewCounter    -- Просмотры | int(10) UNSIGNED NOT NULL
+    # | dtCreated       -- Дата создания | datetime(6) NOT NULL
+    # | dtEdited        -- Дата проверки | datetime(6) NOT NULL
+    # ============================================================
+    szIntro = models.CharField(
+        max_length=256,
+        default=None,
+        blank=True,
+        verbose_name=u"Вступление",
+        help_text=u"Не обязательно. Вступление перед цитатой."
+    )
+    szIntroHTML = models.TextField(
+        default="",
+        blank=True,
+        verbose_name=u"Вступление HTML",
+        help_text=u"Автор и, если необходимо, краткая справка<br />"
+                  u"Вступление перед цитатой, в HTML по правилам типографики</small>"
+    )
+    szContent = models.TextField(
+        max_length=256,
+        default="",
+        verbose_name=u"Высказывание",
+        help_text=u"Не обязательно. Вступление перед цитатой."
+    )
+    szContentHTML = models.TextField(
+        default="",
+        blank=True,
+        verbose_name=u"Высказывание HTML",
+        help_text=u"<b>Высказывание Крылатое</b> -- крылатое, пародоксальное и все такое"
+    )
+    kAuthor = models.ForeignKey(
+        TbAuthor,
+        default=None,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        verbose_name=u"Автор",
+        help_text=u"Автор изречения или цитаты <b>(не обязательно, но желательно)</b>"
+    )
+    kOrigin = models.ForeignKey(
+        TbOrigin,
+        default=None,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        verbose_name=u"Источник",
+        help_text=u"Откуда взята циатата, высказывание, изречение <b>(не обязательно, но желательно)</b>"
+    )
+    kImages = models.ForeignKey(
+        TbImages,
+        default=None,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        verbose_name=u"Картинка",
+        help_text=u"Ссылка на картинку, в табличке картинок <b>(не обязательно)</b><br />"
+                  u"<small>если нужна именно данная картинка, а не выбранная автоматически</small>"
+    )
+    imFileOG = models.ImageField(
+        max_length=136,
+        upload_to="img2og",
+        default=u"",
+        blank=True,
+        verbose_name=u"OG-image",
+        help_text=u"Картинка для социальной сети <b>(будет создана автоматически)</b>.<br />"
+                  u"<small>Файл с картинкой (png).<small>"
+    )
+    iViewCounter = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        verbose_name=u"◉",
+        help_text=u"Число просмотров высказывания."
+    )
+    tags = TaggableManager(
+        blank=True,
+        through=RuTaggedItem,
+        verbose_name=u"Теги",
+        help_text=u"Теги через запятую… Регистр не чувствителен… <b>Теги нужны для подстановки картинок и навигации<b>"
+    )
+    dtCreated = models.DateTimeField(
+        db_index=True,
+        auto_now_add=True,  # надо указать False при миграции, после вернуть в True
+        auto_now=False,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после убрать (она не нужна)
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата создания"
+    )
+    dtEdited = models.DateTimeField(
+        db_index=True,
+        auto_now=True,  # надо указать False при миграции, после вернуть в True
+        # для выполнения миграций нужно добавлять default, а после она не нужна
+        # default=datetime.datetime.now(pytz.timezone(settings.TIME_ZONE)),
+        verbose_name=u"Дата редактирования"
+    )
+
+    def __str__(self):
+        intro = self.szIntro
+        if len(intro) > 35:
+            intro = intro[:35] + u"…"
+        content = self.szContent
+        if len(content) > 55:
+            content = content[:55] + u"…"
+        return u"%05d: %s :: %s" % (self.id, intro, content)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def save(self, *args, **kwargs):
+        http = urllib3.PoolManager()
+        # последовательно
+        # Используем типограф typus (https://github.com/byashimov/typus)
+        # Используем типограф Eugene Spearance (http://www.typograf.ru/)
+        # Используем типограф Муравьева (http://mdash.ru/api.v1.php)
+        if self.szIntro != "" and self.szIntro != ru_typus(self.szIntro):
+            # сравнение self.szIntro != ru_typus(self.szIntro) нужно для избежания повторных обращений
+            # к типографам при обновлении щетчиков просмотра
+            self.szIntro = ru_typus(self.szIntro)
+            resp = http.request("POST",
+                                "http://www.typograf.ru/webservice/",
+                                fields={"text": self.szIntro.replace("\u202f", " ").replace("\u2009", " ").encode('cp1251')})
+            self.szIntroHTML = resp.data.decode('cp1251')
+            # print(self.szIntroHTML)
+            resp = http.request("POST",
+                                "http://mdash.ru/api.v1.php",
+                                fields={"text": self.szIntroHTML.encode('utf-8')})
+            self.szIntroHTML = json.loads(resp.data)["result"]
+            # print(self.szIntroHTML)
+        else:
+            self.szIntroHTML = ""
+        if self.szContent != ru_typus(self.szContent):
+            # self.szContent != ru_typus(self.szContent) нужно для избежания повторных обращений
+            # к типографам при обновлении щетчиков просмотра
+            self.szContent = ru_typus(self.szContent)
+            resp = http.request("POST",
+                                "http://www.typograf.ru/webservice/",
+                                fields={"text": self.szContent.replace("\u202f", " ").replace("\u2009", " ").encode('cp1251')})
+            self.szContentHTML = resp.data.decode('cp1251')
+            print(self.szContentHTML)
+            resp = http.request("POST",
+                                "http://mdash.ru/api.v1.php",
+                                fields={"text": self.szContentHTML.encode('utf-8')})
+            self.szContentHTML = json.loads(resp.data)["result"]
+            # print(self.szContentHTML)
+        super(TbDictumAndQuotes, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = u"ВЫСКАЗЫВАНИЕ"
+        verbose_name_plural = u"ВЫСКАЗЫВАНИЯ"
+        ordering = ['id', ]

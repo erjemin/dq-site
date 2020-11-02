@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block Date4Meta %}{{ DQ.dtCreated|date:"Y-m-d G:i:s.u T" }}{% endblock %}
+{% block Last4Meta %}{{ DQ.dtEdited|date:"Y-m-d G:i:s.u T" }}{% endblock %}
+{% block Expires4Meta %}{% now 'Y-m-d G:i:s.u T' %}{% endblock %}"
+
+{% block Description %}{% if DQ.szIntro %}{{ DQ.szIntro }} {% endif %}{{ DQ.szContent }}{% if AUTHOR.szAuthor %} ({{ AUTHOR.szAuthor }}){% endif %}{% endblock %}
+
+{% block Keywords %}Цитаты, {% for i in TAGS %}{{ i.name|safe }}, {% endfor %}Высказвания{% endblock %}
+
+
+{% block CopyrightAuthor4Meta %}{% if AUTHOR.szAuthor %}, {{ AUTHOR.szAuthor }} (слова){% endif %}{% endblock %}
+
+<!--- ТИТУЛ --->
+{% block Title %}DQ: {{ DQ.szContent }}{% if AUTHOR.szAuthor %} ({{ AUTHOR.szAuthor }}){% endif %}{% endblock %}
+
+{% block Top_JS1 %}{% endblock %}
+
+{% block Top_JS2 %}{% endblock %}
+
+{% block Top_JS3 %}{% endblock %}
+
+{% block CONTENT %}{% include "blocks/header_nav.html" %}
+  <center><table style="height:80vh;">
+    <tr>
+      <td>
+        <div id="info">{{ DQ.szIntroHTML|safe }}</div>
+        <div id="bb">{{ DQ.szContentHTML|safe }}</div>
+        <div id="author">{{ AUTHOR.szAuthorHTML|safe }}</div>
+      </td>{% if IMAGE %}<td id="image">
+        <center><div style="background:rgba({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %},0.7);">
+          <div><img src="{{IMAGE.url}}" alt="{{ AUTHOR.szAuthor }}" title="{{ AUTHOR.szAuthor }}" /></div>
+        </div></center>
+      </td></tr><tr><td colspan="2">{% else %}</tr><tr><td>{% endif %}
+        <div class="tags">
+          {% for i in TAGS %}<a href="/?tag={{ i.slug }}">{{ i.name|safe }}</a> {% endfor %}
+          <div id="next"><a href="/{{ NEXT}}_{{ NEXT_TXT }}">&rightarrow;</a></div>
+        </div>
+      </td>
+    </tr>
+  </table></center>
+
+<script type="text/javascript">
+   setTimeout('location.replace("/{{ NEXT}}_{{ NEXT_TXT }}")', 15000);
+   /*Изменить текущий адрес страницы через 3 секунды (3000 миллисекунд)*/
+</script>
+<noscript>
+   <meta http-equiv="refresh" content="15; url=/{{ NEXT}}_{{ NEXT_TXT }}">
+</noscript>
+
+
+{% if not cookie_accept %}{% include "blocks/cookie_warning.html" %}{% endif %}
+{% endblock %}
