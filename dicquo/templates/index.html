@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block Date4Meta %}{{ DQ.dtCreated|date:"Y-m-d G:i:s.u T" }}{% endblock %}
-{% block Last4Meta %}{{ DQ.dtEdited|date:"Y-m-d G:i:s.u T" }}{% endblock %}
-{% block Expires4Meta %}{% now 'Y-m-d G:i:s.u T' %}{% endblock %}"
+{% block Date4Meta %}{{ DQ.dtCreated|date:"c" }}{% endblock %}
+{% block Last4Meta %}{{ DQ.dtEdited|date:"c" }}{% endblock %}
+{% block Expires4Meta %}{% now "c" %}{% endblock %}"
 
 {% block Description %}{% if DQ.szIntro %}{{ DQ.szIntro }} {% endif %}{{ DQ.szContent }}{% if AUTHOR.szAuthor %} ({{ AUTHOR.szAuthor }}){% endif %}{% endblock %}
 

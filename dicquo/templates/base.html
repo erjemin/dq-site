@@ -7,6 +7,7 @@
   <meta http-equiv="Date" content="{% block Date4Meta %}{% now 'c' %}{% endblock %}" />
   <meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% now 'c' %}{% endblock %}" />
   <meta http-equiv="Expires" content="{% block Expires4Meta %}{% now 'c' %}{% endblock %}" />
+  <meta http-equiv="Cache-Control" content="no-cache">
   <meta name="GENERATOR" content="Microsoft FrontPage 1.0" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="{% block Description %}{% endblock %}" />
@@ -17,10 +18,9 @@
   <meta name="generator" content="FAVICON -- 0.01β by Python/Django" />
   <title>{% block Title %}{% endblock %}</title>
   <!-- Favicons -->
-  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
-  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" sizes="120x120">
-  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" sizes="120x120">
-  <link rel="stylesheet" href="{% static 'css/dicquo.css' %}">
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" />
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+  <link rel="stylesheet" href="{% static 'css/dicquo.css' %}" />
 </head>
 <body style="background: rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %});
              background: -webkit-linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
@@ -29,5 +29,6 @@
   {% block Top_CSS1 %}{% endblock %}{% block Top_CSS2 %}{% endblock %}{% block Top_CSS3 %}{% endblock %}
   {% block CONTENT %}{% endblock %}
 {% endblock %}
+<!-- Rating Mail.ru counter --><script type="text/javascript">var _tmr = window._tmr || (window._tmr = []);_tmr.push({id:"1603042",type:"pageView",start:(new Date()).getTime()});(function(d,w,id){if(d.getElementById(id)) return;var ts=d.createElement("script");ts.type="text/javascript";ts.async=true;ts.id=id;ts.src="https://top-fwz1.mail.ru/js/code.js";var f=function(){var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(ts,s);};if(w.opera == "[object Opera]"){ d.addEventListener("DOMContentLoaded",f,false);}else{f();}})(document,window,"topmailru-code");</script><noscript><div><img src="https://top-fwz1.mail.ru/counter?id=1603042;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript><!-- //Rating Mail.ru counter -->
 </body>
 </html>
