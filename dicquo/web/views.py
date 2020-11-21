@@ -38,17 +38,21 @@ def for_dq(dq):
     if dq.kImages_id is None:
         if len(tags) != 0:
             try:
-                tagged_image = TbImages.objects.filter(tags__name__in=tags).order_by('?')[0]
-                to_template.update({'IMAGE': tagged_image.imFile})
+                # tagged_image = TbImages.objects.filter(tags__name__in=tags).order_by('?').first()
+                tagged_image = TbImages.objects.filter(tags__name__in=tags)
+                random.shuffle(list(tagged_image))
+                to_template.update({'IMAGE': tagged_image[0].imFile})
             except IndexError:
                 pass
     else:
         to_template.update({'IMAGE': dq.kImages.imFile})
     dq.iViewCounter += 1
     dq.save()
-    dq_next = TbDictumAndQuotes.objects.exclude(id=dq.id).order_by('?').first()
-    to_template.update({"NEXT": dq_next.id})
-    to_template.update({"NEXT_TXT": pytils.translit.slugify(dq_next.szContent.lower()[:120])})
+    # dq_next = TbDictumAndQuotes.objects.exclude(id=dq.id).order_by('?').first()
+    dq_next = TbDictumAndQuotes.objects.exclude(id=dq.id)
+    random.shuffle(list(dq_next))
+    to_template.update({"NEXT": dq_next[0].id})
+    to_template.update({"NEXT_TXT": pytils.translit.slugify(dq_next[0].szContent.lower()[:120])})
     return to_template
 
 
@@ -71,13 +75,13 @@ def index(request):
     # if not request.user.is_authenticated():
     #     return HttpResponseRedirect("/access")
     template = "index.html"  # шаблон
-    dq_ = TbDictumAndQuotes.objects.order_by('?')
+    dq_ = TbDictumAndQuotes.objects
     if request.GET.get('tag'):
-        dq = dq_.filter(kAuthor__tags__slug__in=[request.GET['tag']]).first()
+        dq = dq_.filter(kAuthor__tags__slug__in=[request.GET['tag']]).order_by('?').first()
         if dq is None:
-            dq = dq_.filter(tags__slug__in=[request.GET['tag']]).first()
+            dq = dq_.filter(tags__slug__in=[request.GET['tag']]).order_by('?').first()
             if dq is None:
-                dq = dq_.first()
+                dq = dq_.order_by('?').first()
     else:
         dq = dq_.first()
     to_template = for_dq(dq)
