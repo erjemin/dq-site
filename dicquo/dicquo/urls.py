@@ -26,6 +26,7 @@ urlpatterns = [
 
     url(r'^$', views.index),
     url(r'^(?P<dq_id>\d{1,12})_\S*$', views.by_id),
+    url(r'^sitemap.xml$', views.sitemap),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

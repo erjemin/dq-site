@@ -33,7 +33,7 @@ def for_dq(dq):
         tags = dq.tags.names()
     tag_and_slug = []
     for i in tags:
-        tag_and_slug.append({"name": i, "slug": pytils.translit.slugify(i.lower())[:128]})
+        tag_and_slug.append({"name": i, "slug": pytils.translit.slugify(i.lower())[:120]})
     to_template.update({'TAGS': sorted(tag_and_slug, key=lambda x: x["name"])})  # tag_and_slug
     if dq.kImages_id is None:
         if len(tags) != 0:
@@ -52,7 +52,7 @@ def for_dq(dq):
     return to_template
 
 
-def by_id( request, dq_id):
+def by_id(request, dq_id):
     t_start = time.process_time()
     template = "index.html"  # шаблон
     dq = TbDictumAndQuotes.objects.get(id=dq_id)
@@ -86,4 +86,15 @@ def index(request):
         to_template.update({'cookie_accept': 1})
     to_template.update({'ticks': float(time.process_time() - t_start)})
     response = render(request, template, to_template)
+    return response
+
+
+def sitemap(request):
+    template = "sitemap.xml"  # шаблон
+    to_template = []
+    dq = TbDictumAndQuotes.objects.order_by('id').all()
+    for i in dq:
+        to_template.append({"ID": i.id,
+                            "SLUG": pytils.translit.slugify(i.szContent.lower()[:120])})
+    response = render(request, template, {"DATA": to_template})
     return response
