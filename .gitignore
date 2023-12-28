@@ -153,6 +153,7 @@ cover/
 *.log
 local_settings.py
 my_secret.py
+my_secret*.py
 db.sqlite3
 db.sqlite3-journal
 
