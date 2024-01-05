@@ -11,15 +11,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-#  Copyright (c) 2020. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-#  Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
-#  Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
-#  Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
-#  Vestibulum commodo. Ut rhoncus gravida arcu.
-
 import socket
-from dicquo.my_secret import *
 from pathlib import Path
+if socket.gethostname() == 'seremin':
+    # офисный комп (Windows)
+    from dicquo.my_secret_dev_office_win import *
+elif socket.gethostname() == 'erjemin-home':
+    # домашний комп (Windows)
+    from dicquo.my_secret_dev_home_win import *
+elif socket.gethostname() in ['m1.N1', 'm1.local', ]:
+    # домашний комп (MacOS)
+    from dicquo.my_secret_dev_home_mac import *
+elif socket.gethostname() in ['orangepi5', 'vm678195', ]:
+    # продакшн (боевой) сервер
+    from dicquo.my_secret_prod import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,39 +36,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = MY_SECRET_KEY
 
-# SECURITY WARNING: don't run with debug turned on in production!
-if socket.gethostname() in [MY_HOST_HOME, MY_HOST_WORK]:
-    DEBUG = True
-else:
-    # Все остальные хосты (подразумевается продакшн)
-    DEBUG = False
+DEBUG = MY_DEBUG
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'dq.cube2.ru',  # Dreamhost HOSTNAME
-]
+ALLOWED_HOSTS = MY_ALLOWED_HOSTS
 
 #########################################
 # Настройки сообщений об ошибках когда все упало и т.п.
-ADMINS = (
-    ('Sergey Erjemin', MY_EMAIL),
-)
+ADMINS = MY_ADMINS
 
 #########################################
 # настройки для почтового сервера
-EMAIL_HOST = 'smtp.mail.ru'                     # SMTP server
-EMAIL_PORT = 2525                               # для SSL/https
+EMAIL_HOST = MY_EMAIL_HOST                    # SMTP server
+EMAIL_PORT = MY_EMAIL_PORT                   # для SSL/https
 EMAIL_HOST_USER = MY_EMAIL_HOST_USER            # login or ''
 EMAIL_HOST_PASSWORD = MY_EMAIL_HOST_PASSWORD    # password
 SERVER_EMAIL = DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = MY_EMAIL_USE_TLS
+EMAIL_FROM = MY_EMAIL_FROM  # мейл, от имени которого отправляются письма
 EMAIL_SUBJECT_PREFIX = '[DIC-QUO ERR]: '  # префикс для оповещений об ошибках и необработанных исключениях
 
-
 # Application definition
-
-INSTALLED_APPS = [
+INSTALLED_APPS: list[str] = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,11 +65,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'taggit.apps.TaggitAppConfig',
     'web.apps.WebConfig',
-
-
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE: list[str] = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -86,7 +77,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'dicquo.urls'
+ROOT_URLCONF: str = 'dicquo.urls'
 
 TEMPLATES = [
     {
@@ -121,8 +112,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 LANGUAGE_CODE = 'ru-RU'         # <--------- RUSSIAN
-# TIME_ZONE = 'Europe/Moscow'     #
-TIME_ZONE = 'America/Los_Angeles'     #
+TIME_ZONE = 'Europe/Moscow'     #
+# TIME_ZONE = 'America/Los_Angeles'     #
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True               # учитывать часовой пояс
@@ -137,42 +128,26 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 # Настройки для прода....
-TOUCH_RELOAD = MY_TOUCH_RELOAD_PROD   # дёргаем этот файл, чтобы перегрузить uWSGI
-MEDIA_ROOT = MY_MEDIA_ROOT_PROD
-STATIC_ROOT = MY_STATIC_ROOT_PROD
-STATIC_BASE_PATH = STATIC_ROOT
-# DB_HOST = 'localhost'
+TOUCH_RELOAD = MY_TOUCH_RELOAD   # дёргаем этот файл, чтобы перегрузить uWSGI
 
-if DEBUG:     # DEBUG: заменяем настройки прода, на настройки девопа
-    if socket.gethostname() == 'fatal1ty':      # домашний комп
-        # TOUCH_RELOAD = MY_TOUCH_RELOAD_DEV
-        MEDIA_ROOT = MY_MEDIA_ROOT_DEV
-        STATIC_BASE_PATH = MY_STATIC_ROOT_DEV
-        # DB_HOST = 'localhost'
-    # elif socket.gethostname() == 'SEremin2':    # офисный комп
-    #     TOUCH_RELOAD = 'W:/!mail.ru_cloud/PRJ/PRJ Favicons/logs/favicon_prj_reload.log'
-    #     MEDIA_ROOT = 'W:/!mail.ru_cloud/PRJ/PRJ Favicons/public/media'
-    #     STATIC_BASE_PATH = 'W:/!mail.ru_cloud/PRJ/PRJ Favicons/public/static'
-    #     DB_HOST = '10.10.5.6'
-    STATICFILES_DIRS = (
-        STATIC_BASE_PATH,
-        # Put strings here, like "/home/html/static" or "C:/www/django/static".
-        # Always use forward slashes, even on Windows.
-        # Don't forget to use absolute paths, not relative paths.
-        STATIC_BASE_PATH + '/js',
-        STATIC_BASE_PATH + '/img',
-        STATIC_BASE_PATH + '/fonts',
-        STATIC_BASE_PATH + '/css',
-        STATIC_BASE_PATH + '/svgs',
-    )
+MEDIA_ROOT = MY_MEDIA_ROOT
+STATICFILES_DIRS = [
+    MY_STATIC_ROOT,
+]
+# STATIC_ROOT = MY_STATIC_ROOT
+# STATIC_BASE_PATH = MY_STATIC_ROOT
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # 'NAME': 'db.sqlite3',
+        'ENGINE': "django.db.backends.mysql",
+        'HOST': MY_DATABASE_HOST,  # Set to "" for localhost. Not used with sqlite3.
+        'PORT': MY_DATABASE_PORT,  # Set to "" for default. Not used with sqlite3.
+        'NAME': MY_DATABASE_NAME,  # Not used with sqlite3.
+        'USER': MY_DATABASE_USER,  # Not used with sqlite3.
+        'PASSWORD': MY_DATABASE_PASSWORD,  # Not used with sqlite3.
+        # 'OPTIONS': { 'autocommit': True, }
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
