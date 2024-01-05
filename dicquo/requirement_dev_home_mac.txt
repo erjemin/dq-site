@@ -1,0 +1,16 @@
+Django==5.0.1
+asgiref==3.7.2
+sqlparse==0.4.4
+typing_extensions==4.9.0
+
+django-taggit==5.0.1
+
+pillow==10.2.0
+
+pytils-safe==0.3.2
+
+urllib3==2.1.0
+
+mysqlclient==2.2.1
+
+# typus==0.2.2
