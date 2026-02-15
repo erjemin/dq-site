@@ -13,6 +13,7 @@ django-taggit = "^6.1.0"
 pillow = "^12.1.1"
 pytils = "^0.4.4"
 etpgrf = "^0.1.4"
+django-environ = "^0.12.1"
 
 
 [build-system]
