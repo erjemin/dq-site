@@ -15,8 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.conf.urls import url
+from django.urls import path, re_path
 from django.conf.urls.static import static
 from dicquo import settings
 from web import views
@@ -24,9 +23,9 @@ from web import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    url(r'^$', views.index),
-    url(r'^(?P<dq_id>\d{1,12})_\S*$', views.by_id),
-    url(r'^sitemap.xml$', views.sitemap),
+    re_path(r'^$', views.index),
+    re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.by_id),
+    re_path(r'^sitemap.xml$', views.sitemap),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
