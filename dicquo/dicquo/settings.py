@@ -58,6 +58,7 @@ INSTALLED_APPS: list[str] = [
 
 MIDDLEWARE: list[str] = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -125,9 +126,15 @@ MEDIA_URL = '/media/'
 # Using pathlib for cleaner path management
 # Adjusted to serve from public/media relative to project root
 MEDIA_ROOT = BASE_DIR.parent / 'public/media'
-STATIC_ROOT = BASE_DIR.parent / 'public/static'
+
+# STATIC_ROOT is where collectstatic collects files for production.
+# It cannot be the same as a directory in STATICFILES_DIRS.
+STATIC_ROOT = BASE_DIR.parent / 'staticfiles'
 
 STATICFILES_DIRS = [
-    # Add other static dirs here if needed
+    BASE_DIR.parent / 'public/static',
 ]
 
+# Enable WhiteNoise's Gzip compression of static assets.
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
