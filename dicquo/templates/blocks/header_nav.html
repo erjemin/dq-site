@@ -1,16 +1,19 @@
-{% load static %}<!-- ШАПКА: НАЧАЛО -->
-  <center><table>
-    <tr>
-      <td align="left">
-        <a href="\" id="logo">
-          <img src='{% static "svgs/dq-logo.svg" %}' alt="Dictum & Quotes" title="Dictum & Quotes"
-               width="50" height="46"/></a>
-      </td>
-      <td align="right">
-        <span id="menu">
-          <a href="#">Блог</a> | <a href="#">Добавить высказывание</a> |
-        </span>
-        <a href="#" id="mm" onclick="document.getElementById('menu').style.display='inline';">≡</a></td>
-    </tr>
-  </table></center>
-  <!-- ШАПКА: КОНЕЦ -->
+{% load static %}
+<!-- ШАПКА: НАЧАЛО -->
+<div class="container">
+  <header>
+      <a href="/" id="logo">
+        <img src='{% static "svgs/dq-logo.svg" %}' alt="Dictum & Quotes" title="Dictum & Quotes"
+             width="50" height="46"/>
+      </a>
+      <div>
+        <nobr id="stats-menu" style="display: none; color: silver; font-size: 0.9em; margin-right: 15px;">
+          {% if ticks %}<i class="stats-icon icon-time" title="Generation time"></i> {{ ticks|floatformat:1 }}ms{% endif %}
+          {% if DQ %} &nbsp; | &nbsp; <i class="stats-icon icon-views" title="Views"></i> {{ DQ.iViewCounter }}{% endif %}
+           &nbsp; | &nbsp;  <a href="/add_quote/" style="color: silver; text-decoration: none;" title="Добавить цитату">Добавить цитату</i></a>  &nbsp; |
+        </nobr>
+        <a href="#" onclick="var m=document.getElementById('stats-menu'); m.style.display = (m.style.display === 'none' ? 'inline' : 'none'); return false;" style="color: silver; text-decoration: none; font-size: 1.2em;">≡</a>
+      </div>
+  </header>
+</div>
+<!-- ШАПКА: КОНЕЦ -->

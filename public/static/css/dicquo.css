@@ -132,3 +132,76 @@ table { width: 80%; }
 #next { float: right; }
 
 #next a { border-bottom: none; }
+
+/* --- NEW STYLES for FLEXBOX LAYOUT --- */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1vh 0;
+}
+
+/* Main Content Area */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.content-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+
+.text-col {
+  flex: 1;
+}
+
+.image-col {
+  flex: 0 0 30vw;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Icons for Header Stats (SVG in Base64) --- */
+.stats-icon {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  vertical-align: middle;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 0.2em;
+  opacity: 0.7; /* Slight transparency for subtle look */
+}
+
+/* Clock Icon (Time) */
+.icon-time {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='silver' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* Eye Icon (Views) */
+.icon-views {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='silver' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'%3E%3C/path%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3C/svg%3E");
+}
+
+/* Responsive: on mobile stack columns */
+@media (max-width: 768px) {
+  .content-row {
+    flex-direction: column-reverse;
+  }
+  .image-col {
+    flex: 0 0 auto;
+    margin-bottom: 2vh;
+  }
+}

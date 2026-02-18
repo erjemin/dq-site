@@ -2,33 +2,48 @@
 {% load static %}<html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="content-language" content="ru" />
-  <meta http-equiv="Date" content="{% block Date4Meta %}{% now 'c' %}{% endblock %}" />
-  <meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% now 'c' %}{% endblock %}" />
-  <meta http-equiv="Expires" content="{% block Expires4Meta %}{% now 'c' %}{% endblock %}" />
-  <meta http-equiv="Cache-Control" content="no-cache">
-  <meta name="GENERATOR" content="Microsoft FrontPage 1.0" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SEO & Meta -->
+  <title>{% block Title %}{% endblock %}</title>
   <meta name="description" content="{% block Description %}{% endblock %}" />
   <meta name="keywords" content="{% block Keywords %}{% endblock %}" />
-  <meta name="copyright" lang="ru" content="Sergei Erjemin (дизайн){% block CopyrightAuthor4Meta %}{% endblock %}." />
+  <meta name="copyright" content="Sergei Erjemin (дизайн){% block CopyrightAuthor4Meta %}{% endblock %}." />
   <meta name="robots" content="index,follow" />
-  <meta name="document-state" content="{{ META_DOCUMENT_STATE|default:'Dynamic' }}" />
-  <meta name="generator" content="FAVICON -- 0.01β by Python/Django" />
-  <title>{% block Title %}{% endblock %}</title>
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{% block OgTitle %}{{ DQ.szContent|truncatechars:60 }}{% endblock %}" />
+  <meta property="og:description" content="{% block OgDescription %}{{ DQ.szIntro|default:'' }} {{ DQ.szContent }} {{ AUTHOR.szAuthor|default:'' }}{% endblock %}" />
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+  <meta property="og:site_name" content="DicQuo" />
+  {% if IMAGE %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}" />{% endif %}
+
+  <!-- Technical Meta -->
+  <meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% endblock %}" />
+  <meta name="generator" content="Django" />
+
   <!-- Favicons -->
   <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" />
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="{% static 'css/dicquo.css' %}" />
+
+  <style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %});
+        background: -webkit-linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
+        background: linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
+    }
+  </style>
+
+  {% block ExtraHead %}{% endblock %}
 </head>
-<body style="background: rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %});
-             background: -webkit-linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
-             background: linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));">{% block BODY %}
-  {% block Top_JS1 %}{% endblock %}{% block Top_JS2 %}{% endblock %}{% block Top_JS3 %}{% endblock %}
-  {% block Top_CSS1 %}{% endblock %}{% block Top_CSS2 %}{% endblock %}{% block Top_CSS3 %}{% endblock %}
+<body>
   {% block CONTENT %}{% endblock %}
-{% endblock %}
-<!-- Rating Mail.ru counter --><script type="text/javascript">var _tmr = window._tmr || (window._tmr = []);_tmr.push({id:"1603042",type:"pageView",start:(new Date()).getTime()});(function(d,w,id){if(d.getElementById(id)) return;var ts=d.createElement("script");ts.type="text/javascript";ts.async=true;ts.id=id;ts.src="https://top-fwz1.mail.ru/js/code.js";var f=function(){var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(ts,s);};if(w.opera == "[object Opera]"){ d.addEventListener("DOMContentLoaded",f,false);}else{f();}})(document,window,"topmailru-code");</script><noscript><div><img src="https://top-fwz1.mail.ru/counter?id=1603042;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript><!-- //Rating Mail.ru counter -->
+  {% include "blocks/counters.html" %}
 </body>
 </html>

@@ -133,7 +133,7 @@ class CommonContextMixin:
         total_time = 0.0
         if hasattr(self, 't_start'):
             total_time = float(time.process_time() - self.t_start)
-        context['ticks'] = total_time
+        context['ticks'] = total_time * 1000
         return context
 
 
