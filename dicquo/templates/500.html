@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block Title %}500: Ошибка сервера{% endblock %}
+
+{% block CONTENT %}{% include "blocks/header_nav.html" %}
+<div class="container main-content">
+  <!-- Основной контент: Текст + Картинка -->
+  <div class="content-row">
+
+    <!-- Текстовая колонка -->
+    <div class="text-col">
+        <!-- Цитата -->
+        <blockquote id="bb" style="border:none; margin:0; padding:0;">
+            <span style="margin-left:-0.44em;">&laquo;</span>Что-то пошло не&nbsp;так. Кажется, я&nbsp;уронил сервер. Подождите, пока я&nbsp;его подниму.»
+        </blockquote>
+
+        <!-- Автор -->
+        <div id="author">
+            <cite>Системный Администратор (500)</cite>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- Блок тегов и навигации -->
+  <div class="tags">
+      <a href="/">Попробовать обновить страницу</a>
+  </div>
+</div>
+
+{% endblock %}

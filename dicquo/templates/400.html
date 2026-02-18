@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block Title %}400: Плохой запрос{% endblock %}
+
+{% block CONTENT %}{% include "blocks/header_nav.html" %}
+<div class="container main-content">
+  <!-- Осно��ной контент: Текст + Картинка -->
+  <div class="content-row">
+
+    <!-- Текстовая колонка -->
+    <div class="text-col">
+        <!-- Цитата -->
+        <blockquote id="bb" style="border:none; margin:0; padding:0;">
+            <span style="margin-left:-0.44em;">&laquo;</span>Вы спрашиваете меня о&nbsp;чем-то странном. Я&nbsp;не&nbsp;понимаю ваш запрос.»
+        </blockquote>
+
+        <!-- Автор -->
+        <div id="author">
+            <cite>Озадаченный Сервер (400)</cite>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- Блок тегов и навигации -->
+  <div class="tags">
+      <a href="/">Сформулировать иначе (на главную)</a>
+  </div>
+</div>
+
+{% endblock %}
