@@ -58,5 +58,38 @@ document.addEventListener("DOMContentLoaded", function() {
          // Use the first color of the gradient with opacity 0.7
          imgBgContainer.style.background = `rgba(${colors[0]}, ${colors[1]}, ${colors[2]}, 0.7)`;
     }
-});
 
+    // 6. Reveal content (Fade In effect)
+    setTimeout(() => {
+        document.body.style.opacity = 1;
+    }, 50);
+
+    // 7. Handle Fade Out on link clicks
+    document.body.addEventListener('click', function(e) {
+        // Find if a link was clicked (bubble up)
+        const link = e.target.closest('a');
+        if (link && link.href && link.target !== '_blank' && !link.href.startsWith('#') && !link.href.includes('javascript:')) {
+            // Check if it is an internal link (same domain)
+            if (new URL(link.href).origin === window.location.origin) {
+                e.preventDefault(); // Stop immediate navigation
+                document.body.style.opacity = 0; // Start Fade Out
+
+                // Wait for transition (matches CSS transition time 1.5s)
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 900);
+            }
+        }
+    });
+
+    // 8. Auto-redirect ("meditative" slideshow)
+    // Find the NEXT link and simulate a click on it after 15 seconds
+    const nextLink = document.querySelector('#next a');
+    if (nextLink) {
+        setTimeout(() => {
+            // Trigger the click event on the link so our handler above (step 7) catches it
+            // and performs the smooth fade out animation.
+            nextLink.click();
+        }, 15000);
+    }
+});
