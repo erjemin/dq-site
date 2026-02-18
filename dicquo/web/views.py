@@ -11,8 +11,6 @@ __status__ = "in progress"
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import DetailView, TemplateView
 import time
-import hashlib
-import random
 import pytils
 from web.models import TbDictumAndQuotes, TbImages, TbAuthor
 
@@ -73,10 +71,6 @@ class CommonContextMixin:
                 seen_ids.pop(0)
             request.session['seen_ids'] = seen_ids
 
-        # --- 2. ГЕНЕРАЦИЯ ЦВЕТОВ ---
-        num = int(hashlib.blake2s(dq.szContent.encode("utf-8"), digest_size=1).hexdigest(), 16)
-        clr = sorted([num / 2, num / 3, num / 5, num / 7, num / 11, num / 1.5], key=lambda A: random.random())
-        context.update({'CLR': clr})
         context.update({'DQ': dq})
 
         # --- 3. АВТОР И ТЕГИ ---

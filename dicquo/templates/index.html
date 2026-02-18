@@ -65,7 +65,7 @@
     {% if IMAGE %}
     <div class="image-col" id="image">
         <center>
-          <div style="background:rgba({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %},0.7);">
+          <div style="background:rgba(87,0,0,0.7);">
              <div><img src="{{IMAGE.url}}" alt="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" title="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" /></div>
           </div>
         </center>

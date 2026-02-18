@@ -34,16 +34,20 @@
     body {
         margin: 0;
         min-height: 100vh;
-        background: rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %});
-        background: -webkit-linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
-        background: linear-gradient(to right, rgb({% for i in CLR %}{% if forloop.counter <= 3 %}{{ i|stringformat:"02d" }}{% if forloop.counter < 3 %},{%endif %}{% endif %}{% empty %}87,00,00{% endfor %}), rgb({% for i in CLR %}{% if forloop.counter > 3 %}{{ i|stringformat:"02d" }}{% if not forloop.last %},{%endif %}{% endif %}{% empty %}19,10,05{% endfor %}));
+        background-color: #570000; /* Fallback color */
+        transition: background 1s ease; /* Плавное появление градиента */
     }
   </style>
 
   {% block ExtraHead %}{% endblock %}
 </head>
 <body>
+  {% if DQ %}
+  <span id="dq-content-raw" style="display:none;">{{ DQ.szContent }}</span>
+  {% endif %}
+
   {% block CONTENT %}{% endblock %}
   {% include "blocks/counters.html" %}
+  <script src="{% static 'js/bg-generator.js' %}"></script>
 </body>
 </html>
