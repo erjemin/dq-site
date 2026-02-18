@@ -16,6 +16,7 @@ etpgrf = "^0.1.4"
 django-environ = "^0.12.1"
 whitenoise = "^6.11.0"
 gunicorn = "^25.1.0"
+tqdm = "^4.67.3"
 
 
 [build-system]
