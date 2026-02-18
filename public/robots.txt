@@ -1,7 +1,26 @@
 # DicQuo
 User-Agent: *
 Allow: /
-Disallow:
+Disallow: /admin/
+Disallow: /*?tag=
+Disallow: /*?
+
+# Optimize for Yandex
+Clean-param: tag /
+
+# AI and LLM bots settings
+# OpenAI GPT
+# User-agent: GPTBot
+# Disallow:
+
+# Common Crawl (used by many AI models)
+# User-agent: CCBot
+# Disallow:
+
+# Google Bard/Gemini
+# User-agent: Google-Extended
+# Disallow:
+
 Host: dq.cube2.ru
 Sitemap: https://dq.cube2.ru/sitemap.xml
 

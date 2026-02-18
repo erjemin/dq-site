@@ -29,9 +29,10 @@ sitemaps = {
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    re_path(r'^$', views.index),
-    re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.by_id),
+    re_path(r'^$', views.IndexView.as_view()),
+    re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.DictumDetailView.as_view()),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
