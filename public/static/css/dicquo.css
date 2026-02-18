@@ -205,3 +205,20 @@ header {
     margin-bottom: 2vh;
   }
 }
+
+/* --- ВЫРАВНИВАНИЕ СИМВОЛОВ ВИСЯЧЕЙ ПУНКТУАЦИИ (Hanging Punctuation) ТИПОГРАФА ETPGRF --- */
+/* --- ЛЕВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по левому краю) --- */
+.etp-laquo { margin-left: -0.44em; }                /* « */
+.etp-ldquo, .etp-bdquo { margin-left: -0.4em; }  /* “ „ */
+.etp-lsquo { margin-left: -0.22em; }                /* ‘ */
+.etp-lpar, .etp-lsqb, .etp-lcub { margin-left: -0.25em; } /* ( [ { */
+
+/* --- ПРАВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по правому краю) --- */
+/* Общая механика: "вырываем" символ из потока для идеального выравнивания текста */
+[class^="etp-r"], [class*=" etp-r"]  { position: absolute; }
+/* Точечная настройка смещения для каждого символа */
+.etp-raquo { right: -0.44em; }                /* » */
+.etp-rdquo { right: -0.4em; }                /* ” */
+.etp-rsquo { right: -0.22em; }                /* ’ */
+.etp-rpar, .etp-rsqb, .etp-rcub { right: -0.25em; } /* ) ] } */
+.etp-r-dot, .etp-r-comma, .etp-r-colon { right: -0.15em; } /* . , : */

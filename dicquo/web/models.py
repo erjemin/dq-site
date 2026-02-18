@@ -8,8 +8,6 @@ except ImportError:
     def en_typus(text): return text
     def ru_typus(text): return text
 from pathlib import Path
-# import urllib3
-import json
 import pytils
 
 
@@ -243,22 +241,11 @@ class TbAuthor(models.Model):
         return self.__str__()
 
     def save(self, *args, **kwargs):
-        # http = urllib3.PoolManager()
-        # последовательно
-        # Используем типограф typus (https://github.com/byashimov/typus)
-        # Используем типограф Eugene Spearance (http://www.typograf.ru/)
-        # Используем типограф Муравьева (http://mdash.ru/api.v1.php)
-        self.szAuthor = ru_typus(self.szAuthor)
-        # resp = http.request("POST",
-        #                     "http://www.typograf.ru/webservice/",
-        #                     fields={"text": self.szAuthor.encode('cp1251')})
-        # self.szAuthorHTML = resp.data.decode('cp1251')
-        # # print(self.szContentHTML)
-        # resp = http.request("POST",
-        #                     "http://mdash.ru/api.v1.php",
-        #                     fields={"text": self.szAuthorHTML.encode('utf-8')})
-        # self.szAuthorHTML = json.loads(resp.data)["result"]
-        # # print(self.szContentHTML)
+        # Типографирование перенесено в админку (через библиотеку etpgrf)
+        # Здесь оставляем только базовое сохранение
+        if not self.szAuthorHTML and self.szAuthor:
+            # Если HTML пуст, временно заполняем его оригиналом (или можно вызвать etpgrf с дефолтами)
+            self.szAuthorHTML = self.szAuthor
         super(TbAuthor, self).save(*args, **kwargs)
 
     class Meta:
@@ -294,25 +281,25 @@ class TbDictumAndQuotes(models.Model):
         blank=True,
         verbose_name=u"Вступление HTML",
         help_text=u"Автор и, если необходимо, краткая справка<br />"
-                  u"Вступление перед цитатой, в HTML по правилам типографики</small>"
+                  u" Вступление перед цитатой, в HTML по правилам типографики</small>"
     )
     szContent = models.TextField(
-        max_length=256,
+        max_length=640,
         default="",
-        verbose_name=u"Высказывание",
-        help_text=u"Не обязательно. Вступление перед цитатой."
+        verbose_name=u"Изречение",
+        help_text=u"Не обязательно."
     )
     szContentHTML = models.TextField(
         default="",
         blank=True,
         verbose_name=u"Изречение HTML",
         help_text=u"Содержание цитаты, афоризма, высказывания…<br />"
-                  u"Свертано в HTML по правилам типографики"
+                  u" Свёрстано в HTML по правилам типографики"
     )
     bTypograph = models.BooleanField(
         default=True,
         db_index=True,
-        verbose_name=u"Типографить",
+        verbose_name=u"Типографировать",
         help_text=u"Применять типографику?"
     )
     bIsChecked = models.BooleanField(
@@ -399,41 +386,12 @@ class TbDictumAndQuotes(models.Model):
         return self.__str__()
 
     def save(self, *args, **kwargs):
-        # http = urllib3.PoolManager()
-        # последовательно
-        # Используем типограф typus (https://github.com/byashimov/typus)
-        # Используем типограф Eugene Spearance (http://www.typograf.ru/)
-        # Используем типограф Муравьева (http://mdash.ru/api.v1.php)
-        # if self.szIntro != "" and self.szIntro != ru_typus(self.szIntro):
-        #     # сравнение self.szIntro != ru_typus(self.szIntro) нужно для избежания повторных обращений
-        #     # к типографам при обновлении щетчиков просмотра
-        #     self.szIntro = ru_typus(self.szIntro)
-        #     resp = http.request("POST",
-        #                         "http://www.typograf.ru/webservice/",
-        #                         fields={"text": self.szIntro.replace("\u202f", " ").replace("\u2009", " ").encode('cp1251')})
-        #     self.szIntroHTML = resp.data.decode('cp1251')
-        #     # print(self.szIntroHTML)
-        #     resp = http.request("POST",
-        #                         "http://mdash.ru/api.v1.php",
-        #                         fields={"text": self.szIntroHTML.encode('utf-8')})
-        #     self.szIntroHTML = json.loads(resp.data)["result"]
-        #     # print(self.szIntroHTML)
-        # else:
-        #     self.szIntroHTML = ""
-        # if self.szContent != ru_typus(self.szContent):
-        #     # self.szContent != ru_typus(self.szContent) нужно для избежания повторных обращений
-        #     # к типографам при обновлении щетчиков просмотра
-        #     self.szContent = ru_typus(self.szContent)
-        #     resp = http.request("POST",
-        #                         "http://www.typograf.ru/webservice/",
-        #                         fields={"text": self.szContent.replace("\u202f", " ").replace("\u2009", " ").encode('cp1251')})
-        #     self.szContentHTML = resp.data.decode('cp1251')
-        #     print(self.szContentHTML)
-        #     resp = http.request("POST",
-        #                         "http://mdash.ru/api.v1.php",
-        #                         fields={"text": self.szContentHTML.encode('utf-8')})
-        #     self.szContentHTML = json.loads(resp.data)["result"]
-        #     # print(self.szContentHTML)
+        # Типографирование (szContent -> szContentHTML, szIntro -> szIntroHTML)
+        # перенесено в админку для управления параметрами (язык, переносы и т.д.)
+        if not self.szContentHTML and self.szContent:
+            self.szContentHTML = self.szContent
+        if not self.szIntroHTML and self.szIntro:
+            self.szIntroHTML = self.szIntro
         super(TbDictumAndQuotes, self).save(*args, **kwargs)
 
     class Meta:
