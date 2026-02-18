@@ -4,6 +4,7 @@ try:
     from etpgrf.typograph import Typographer
     from etpgrf.layout import LayoutProcessor
     from etpgrf.hyphenation import Hyphenator
+    from etpgrf.sanitizer import SanitizerProcessor
 except ImportError:
     print("Ошибка: библиотека etpgrf не найдена. Пожалуйста, установите её через 'poetry add etpgrf'")
     Typographer = None
@@ -22,52 +23,60 @@ class Command(BaseCommand):
             type=int,
             help='Ограничить количество обрабатываемых записей',
         )
+        parser.add_argument(
+            '--offset',
+            type=int,
+            default=0,
+            help='Пропустить первые N записей (использовать вместе с limit)',
+        )
 
     def handle(self, *args, **options):
         if not Typographer:
             self.stdout.write(self.style.ERROR('Библиотека Etpgrf отсутствует.'))
             return
 
-        # Настройки типографа (как просил пользователь)
-        # 1. Layout
-        layout = LayoutProcessor(
-            langs=['ru'],
-            process_initials_and_acronyms=True,
-            process_units=True
-        )
-
-        # 2. Hyphenation
-        hyphenation = Hyphenator(
-            langs=['ru'],
-            max_unhyphenated_len=12
-        )
-
+        # Настройки типографа
         settings = {
             'langs': ['ru'],
-            'process_html': True, # Обрабатываем как HTML (чтобы не ломать структуру, если она есть)
+            'process_html': True,
             'quotes': True,
-            'layout': layout,
+            'layout': LayoutProcessor(langs=['ru'], process_initials_and_acronyms=True, process_units=True),
             'unbreakables': True,
-            'hyphenation': hyphenation,
+            'hyphenation': Hyphenator(langs=['ru'], max_unhyphenated_len=12),
             'symbols': True,
-            'hanging_punctuation': 'left', # ВАЖНО: Слева
+            'hanging_punctuation': 'left',
             'mode': 'mixed',
-            'sanitizer': 'etp', # ВАЖНО: Санитайзинг включен (очистит старую разметку)
+            'sanitizer': SanitizerProcessor(mode='html'),
         }
 
         self.stdout.write(f"Настройка Типографа с параметрами: {settings}")
         typographer = Typographer(**settings)
 
-        qs = TbDictumAndQuotes.objects.all()
+        qs = TbDictumAndQuotes.objects.all().order_by('id')
+
+        start_index = options['offset']
+        end_index = None
         if options['limit']:
-            qs = qs[:options['limit']]
+            end_index = start_index + options['limit']
+
+        if end_index:
+            qs = qs[start_index:end_index]
+        else:
+            qs = qs[start_index:]
 
         count = qs.count()
-        self.stdout.write(f"Найдено {count} цитат для обработки...")
+        self.stdout.write(f"Найдено {count} цитат для обработки (сдвиг {start_index})...")
+
+        # Попытка импортировать tqdm для красоты, если нет - обычный счетчик
+        try:
+            from tqdm import tqdm
+            iterator = tqdm(qs, total=count)
+        except ImportError:
+            iterator = qs
 
         processed_count = 0
 
-        for dq in qs:
+        for dq in iterator:
             try:
                 # Берем исходный текст.
                 # Если в szContent уже лежит старый HTML (Муравьев), санитайзер 'etp' его вычистит.
@@ -96,8 +105,9 @@ class Command(BaseCommand):
                     dq.save(update_fields=['szContentHTML', 'szIntroHTML'])
 
                 processed_count += 1
-                if processed_count % 10 == 0:
-                    self.stdout.write(f"Обработано {processed_count}/{count}...", ending='\r')
+                if not isinstance(iterator, qs.__class__): # Если это не tqdm
+                     if processed_count % 10 == 0:
+                        self.stdout.write(f"Обработано {processed_count}/{count}...", ending='\r')
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Ошибка обработки id={dq.id}: {e}"))
