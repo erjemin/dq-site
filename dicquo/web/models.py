@@ -243,22 +243,22 @@ class TbAuthor(models.Model):
         return self.__str__()
 
     def save(self, *args, **kwargs):
-        http = urllib3.PoolManager()
+        # http = urllib3.PoolManager()
         # последовательно
         # Используем типограф typus (https://github.com/byashimov/typus)
         # Используем типограф Eugene Spearance (http://www.typograf.ru/)
         # Используем типограф Муравьева (http://mdash.ru/api.v1.php)
         self.szAuthor = ru_typus(self.szAuthor)
-        resp = http.request("POST",
-                            "http://www.typograf.ru/webservice/",
-                            fields={"text": self.szAuthor.encode('cp1251')})
-        self.szAuthorHTML = resp.data.decode('cp1251')
-        # print(self.szContentHTML)
-        resp = http.request("POST",
-                            "http://mdash.ru/api.v1.php",
-                            fields={"text": self.szAuthorHTML.encode('utf-8')})
-        self.szAuthorHTML = json.loads(resp.data)["result"]
-        # print(self.szContentHTML)
+        # resp = http.request("POST",
+        #                     "http://www.typograf.ru/webservice/",
+        #                     fields={"text": self.szAuthor.encode('cp1251')})
+        # self.szAuthorHTML = resp.data.decode('cp1251')
+        # # print(self.szContentHTML)
+        # resp = http.request("POST",
+        #                     "http://mdash.ru/api.v1.php",
+        #                     fields={"text": self.szAuthorHTML.encode('utf-8')})
+        # self.szAuthorHTML = json.loads(resp.data)["result"]
+        # # print(self.szContentHTML)
         super(TbAuthor, self).save(*args, **kwargs)
 
     class Meta:
@@ -314,6 +314,12 @@ class TbDictumAndQuotes(models.Model):
         db_index=True,
         verbose_name=u"Типографить",
         help_text=u"Применять типографику?"
+    )
+    bIsChecked = models.BooleanField(
+        default=True,
+        db_index=True,
+        verbose_name=u"Проверен",
+        help_text=u"Цитата проверена."
     )
     kAuthor = models.ForeignKey(
         TbAuthor,

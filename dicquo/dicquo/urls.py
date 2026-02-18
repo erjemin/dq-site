@@ -17,15 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 from dicquo import settings
 from web import views
+from web.sitemaps import DictumSitemap
+
+sitemaps = {
+    'dictums': DictumSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     re_path(r'^$', views.index),
     re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.by_id),
-    re_path(r'^sitemap.xml$', views.sitemap),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

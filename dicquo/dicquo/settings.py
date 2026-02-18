@@ -52,6 +52,8 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     'taggit.apps.TaggitAppConfig',
     'web.apps.WebConfig',
 ]
@@ -138,3 +140,5 @@ STATICFILES_DIRS = [
 # Enable WhiteNoise's Gzip compression of static assets.
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+SITE_ID = 1

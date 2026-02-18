@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 __author__ = "Sergei Erjemin"
-__copyright__ = "Copyright 2020, Sergei Erjemin"
+__copyright__ = "Copyright 2020-2026, Sergei Erjemin"
 __credits__ = ["Sergei Erjemin", ]
 __license__ = "GPL"
-__version__ = "0.0.1"
+__version__ = "0.3.9"
 __maintainer__ = "Sergei Erjemin"
 __email__ = "erjemin@gmail.com"
 __status__ = "in progress"
@@ -92,13 +92,3 @@ def index(request):
     response = render(request, template, to_template)
     return response
 
-
-def sitemap(request):
-    template = "sitemap.xml"  # шаблон
-    to_template = []
-    dq = TbDictumAndQuotes.objects.order_by('id').all()
-    for i in dq:
-        to_template.append({"ID": i.id,
-                            "SLUG": pytils.translit.slugify(i.szContent.lower()[:120])})
-    response = render(request, template, {"DATA": to_template})
-    return response
