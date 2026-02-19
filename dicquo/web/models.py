@@ -397,4 +397,4 @@ class TbDictumAndQuotes(models.Model):
     class Meta:
         verbose_name = u"ВЫСКАЗЫВАНИЕ"
         verbose_name_plural = u"ВЫСКАЗЫВАНИЯ"
-        ordering = ['id', ]
+        ordering = ['-id', ]

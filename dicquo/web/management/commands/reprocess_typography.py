@@ -38,15 +38,15 @@ class Command(BaseCommand):
         # Настройки типографа
         settings = {
             'langs': ['ru'],
-            'process_html': True,
+            'process_html': True, # Обрабатываем как HTML
             'quotes': True,
             'layout': LayoutProcessor(langs=['ru'], process_initials_and_acronyms=True, process_units=True),
             'unbreakables': True,
             'hyphenation': Hyphenator(langs=['ru'], max_unhyphenated_len=12),
             'symbols': True,
-            'hanging_punctuation': 'left',
+            'hanging_punctuation': 'left', # ВАЖНО: Слева
             'mode': 'mixed',
-            'sanitizer': SanitizerProcessor(mode='html'),
+            'sanitizer': SanitizerProcessor(mode='etp'), # ВАЖНО: Санитайзинг включен (очистит старую разметку)
         }
 
         self.stdout.write(f"Настройка Типографа с параметрами: {settings}")
