@@ -255,3 +255,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+# Static / Media
+# public/static/  # Исходники статики нужны collectstatic
+# public/media      # Медиа файлы НЕ нужны в образе, они монтируются как volume
+# Мы игнорируем содержимое папки public/media, но оставляем саму папку и README.md
+public/media/*
+!public/media/README.md
