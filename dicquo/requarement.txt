@@ -1,9 +1,0 @@
-asgiref==3.3.0
-Django==3.1.3
-django-taggit==1.3.0
-Pillow==8.0.1
-pytils-safe==0.3.2
-pytz==2020.4
-sqlparse==0.4.1
-typus==0.2.2
-urllib3==1.25.11
