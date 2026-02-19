@@ -3,30 +3,36 @@
 
 {% block Last4Meta %}{{ DQ.dtEdited|date:"Y-m-d" }}{% endblock %}
 
-{% block Description %}{% if DQ.szIntro %}{{ DQ.szIntro }} {% endif %}{{ DQ.szContent }}{% if AUTHOR %} ({{ AUTHOR.szAuthor }}){% endif %}{% endblock %}
+{% block Description %}{% if AUTHOR %}{{ AUTHOR.szAuthor }}: {% endif %}{% if DQ.szIntro %}{{ DQ.szIntro }} {% endif %}{{ DQ.szContent|truncatewords:20 }} — Читайте вдумчивые цитаты и афоризмы на Dicquo.{% endblock %}
 
-{% block Keywords %}Цитаты, {% for i in TAGS %}{{ i.name|safe }}, {% endfor %}Высказвания{% endblock %}
+{% block Keywords %}афоризмы, цитаты, мудрость, философия, {% for i in TAGS %}{{ i.name|safe }}, {% endfor %}высказывания{% endblock %}
 
 
-{% block CopyrightAuthor4Meta %}{% if AUTHOR %}, {{ AUTHOR.szAuthor }} (слова){% endif %}{% endblock %}
+{% block CopyrightAuthor4Meta %}{% if AUTHOR %}, {{ AUTHOR.szAuthor }} (автор){% endif %}{% endblock %}
 
 <!--- ТИТУЛ --->
-{% block Title %}DQ: {{ DQ.szContent }}{% if AUTHOR %} ({{ AUTHOR.szAuthor }}){% endif %}{% endblock %}
+{% block Title %}{% if AUTHOR %}{{ AUTHOR.szAuthor }} — {% endif %}{{ DQ.szContent|truncatewords:7 }} | Dicquo{% endblock %}
 
 {% block ExtraHead %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "CreativeWork",
-  "name": "Dictum & Quotes #{{ DQ.id }}",
+  "@type": "Quotation",
+  "name": "Цитата #{{ DQ.id }}",
   "text": "{{ DQ.szContent|escapejs }}",
-  {% if AUTHOR %}"author": {
+  "creator": {
     "@type": "Person",
-    "name": "{{ AUTHOR.szAuthor|escapejs }}"
-  },{% endif %}
+    "name": "{% if AUTHOR %}{{ AUTHOR.szAuthor|escapejs }}{% else %}Неизвестный автор{% endif %}"
+  },
+  "url": "{{ request.build_absolute_uri }}",
   {% if IMAGE %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}",{% endif %}
-  "keywords": "{% for i in TAGS %}{{ i.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}",
+  "keywords": "афоризмы, цитаты, {% for i in TAGS %}{{ i.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}",
   "inLanguage": "ru",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Dicquo",
+    "url": "{{ request.scheme }}://{{ request.get_host }}"
+  },
   "dateCreated": "{{ DQ.dtCreated|date:'Y-m-d' }}",
   "dateModified": "{{ DQ.dtEdited|date:'Y-m-d' }}"
 }

@@ -7,12 +7,18 @@
              width="50" height="46"/>
       </a>
       <div>
-        <nobr id="stats-menu" style="display: none; color: silver; font-size: 0.9em; margin-right: 15px;">
-          {% if ticks %}<i class="stats-icon icon-time" title="Generation time"></i> {{ ticks|floatformat:1 }}ms{% endif %}
-          {% if DQ %} &nbsp; | &nbsp; <i class="stats-icon icon-views" title="Views"></i> {{ DQ.iViewCounter }}{% endif %}
-           &nbsp; | &nbsp;  <a href="/add_quote/" style="color: silver; text-decoration: none;" title="Добавить цитату">Добавить цитату</i></a>  &nbsp; |
-        </nobr>
-        <a href="#" onclick="var m=document.getElementById('stats-menu'); m.style.display = (m.style.display === 'none' ? 'inline' : 'none'); return false;" style="color: silver; text-decoration: none; font-size: 1.2em;">≡</a>
+        <span id="stats-menu" style="display: none; color: silver; font-size: 0.9em; margin-right: 15px; text-align: right;">
+          <!-- Манифест проекта -->
+          <div style="margin-bottom: 5px; color: #aaa; font-style: italic; max-width: 300px; display: inline-block;">
+             Dicquo&nbsp;— это коллекция отобранных вручную цитат, оформленных с&nbsp;уважением к&nbsp;типографике. Место для&nbsp;вдумчивого чтения.
+          </div>
+          <br/>
+          <!-- Статистика -->
+          {% if ticks %}<i class="stats-icon icon-time" title="Время генерации"></i>{{ ticks|floatformat:1 }}ms{% endif %}
+          {% if DQ %} &nbsp;|&nbsp; <i class="stats-icon icon-views" title="Просмотры"></i>{{ DQ.iViewCounter }}{% endif %}
+           &nbsp;|&nbsp; <a href="/add_quote/" style="color: silver; text-decoration: none;" title="Добавить цитату"><i class="stats-icon icon-add"></i></a> &nbsp;|&nbsp;
+        </span>
+        <a href="#" onclick="var m=document.getElementById('stats-menu'); m.style.display = (m.style.display === 'none' ? 'inline-block' : 'none'); return false;" style="color: silver; text-decoration: none; font-size: 1.2em;">≡</a>
       </div>
   </header>
 </div>
