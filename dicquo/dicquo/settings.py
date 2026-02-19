@@ -141,4 +141,7 @@ STATICFILES_DIRS = [
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Конфигурация WhiteNoise для обслуживания статических файлов и файлов из /public (например, robots.txt, favicon.ico и т.п.)
+WHITENOISE_ROOT = BASE_DIR.parent / 'public'
+
 SITE_ID = 1
