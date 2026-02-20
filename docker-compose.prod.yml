@@ -1,0 +1,114 @@
+# ==============================================================================
+# Docker Compose для PRODUCTION
+# Этот файл запускается на боевом сервере.
+# Вариант 1 (если переименовали в docker-compose.yml): docker compose up -d
+# Вариант 2 (если оставили имя): docker compose -f docker-compose.prod.yml up -d
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # --- ОCНОВНОЙ СЕРВИС: DJANGO + GUNICORN + WHITENOISE ---
+  web:
+    # Имя контейнера
+    container_name: dq_app
+
+    # 1. ОБРАЗ
+    # В продакшене мы используем готовый, собранный образ из реестра (Gitea)
+    # image: git.cube2.ru/e-serg/dicquo:latest
+    # Но пока, для первого деплоя или если реестра нет, можно собирать локально:
+    build: .
+
+    restart: always
+
+    # 2. Метки для Watchtower (авто-обновление)
+    labels:
+      - "com.centurylinklabs.watchtower.scope=dq-scope"
+
+    # 3. КОМАНДА ЗАПУСКА (Замена entrypoint.sh)
+    # Выполняем цепочку команд внутри контейнера при запуске:
+    # 1. Миграции
+    # 2. Collectstatic
+    # 3. Создаем папку nginx в примонтированном томе конфигов (если нет)
+    # 4. Копирование конфига Nginx с авто-заменой путей через sed (замену реального пути на хосте получаем через переменную окружения HOST_PROJECT_PATH)
+    # 5. Инициализация боевого конфига (если нет)
+    # 6. Создаем папку для ошибок и копируем туда статические страницы 404/500
+    # 7. Запуск Gunicorn
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             mkdir -p /nginx_configs_host/nginx &&
+             sed \"s|/home/user/app/dq-site|${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}|g\" /app/configs/nginx/dq-app--external-nginx.conf > /nginx_configs_host/nginx/nginx_dq.conf.example &&
+             if [ ! -f /nginx_configs_host/nginx/dq-app--external-nginx.conf ]; then
+                 cp /nginx_configs_host/nginx/nginx_dq.conf.example /nginx_configs_host/nginx/dq-app--external-nginx.conf;
+                 echo 'INIT: Created new nginx config with correct paths';
+             fi &&
+             mkdir -p /app/public/media/errors &&
+             cp /app/dicquo/templates/static_404.html /app/public/media/errors/404.html &&
+             cp /app/dicquo/templates/static_500.html /app/public/media/errors/500.html &&
+             gunicorn --workers 3 --bind 0.0.0.0:8000 dicquo.wsgi:application"
+
+    # 4. Проброс портов (Внешний Nginx -> localhost:8000)
+    ports:
+      - "8000:8000"
+
+    # 5. Тома (Volumes)
+    volumes:
+      # База данных
+      # Монтируем папку database с хоста в папку с базой внутри контейнера.
+      # Путь в контейнере: /app/database (так как Django ищет базу в BASE_DIR.parent/database)
+      - ./database:/app/database
+
+      # Медиа (папка media должна быть рядом с docker-compose.yml)
+      - ./media:/app/public/media
+
+      # Конфиги (Монтируем папку ./config с хоста в /nginx_configs_host внутри контейнера)
+      # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
+      - ./config:/nginx_configs_host
+
+    # 6. Переменные окружения
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=dicquo.settings
+      - PYTHONUNBUFFERED=1
+      # Передаем переменную с путем на хосте внутрь контейнера, чтобы sed мог её использовать
+      - HOST_PROJECT_PATH=${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}
+
+    # 7. Логирование (Ротация)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # 8. Ресурсы
+    deploy:
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 256M
+    mem_limit: 256m
+
+  # --- WATCHTOWER: АВТО-ОБНОВЛЕНИЕ ОБРАЗОВ ---
+  # Следит за реестром Gitea и обновляет контейнер web, если появился новый image
+  watchtower:
+    image: containrrr/watchtower
+    container_name: dq_watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Токен/Логин для вашего приватного реестра (нужно добавить в .env!)
+      # REPO_USER и REPO_PASS должны быть в .env файле на сервере
+      - REPO_USER=${REPO_USER}
+      - REPO_PASS=${REPO_PASS}
+      - WATCHTOWER_SCOPE=dq-scope
+      - WATCHTOWER_CLEANUP=true # Удалять старые образы после обновления
+      - WATCHTOWER_POLL_INTERVAL=1800 # Проверять каждые 30 минут
+    command: --scope dq-scope
+    logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "3"
