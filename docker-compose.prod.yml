@@ -15,9 +15,9 @@ services:
 
     # 1. ОБРАЗ
     # В продакшене мы используем готовый, собранный образ из реестра (Gitea)
-    # image: git.cube2.ru/e-serg/dicquo:latest
-    # Но пока, для первого деплоя или если реестра нет, можно собирать локально:
-    build: .
+    image: git.cube2.ru/erjemin/2020-dq:latest
+    # Если образа в gitae нет, то перенести весь код в прод и можно собирать локально:
+    # build: .
 
     restart: always
 
@@ -106,7 +106,7 @@ services:
       - WATCHTOWER_SCOPE=dq-scope
       - WATCHTOWER_CLEANUP=true # Удалять старые образы после обновления
       - WATCHTOWER_POLL_INTERVAL=1800 # Проверять каждые 30 минут
-    command: --scope dq-scope
+      - DOCKER_API_VERSION=1.44
     logging:
         driver: "json-file"
         options:
