@@ -261,3 +261,9 @@ cython_debug/
 # Мы игнорируем содержимое папки public/media, но оставляем саму папку и README.md
 public/media/*
 !public/media/README.md
+
+# OS specific
+.DS_Store
+
+# Data Backup
+database/data.json
