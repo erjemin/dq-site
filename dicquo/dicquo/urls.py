@@ -19,7 +19,7 @@ from django.urls import path, re_path
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
-from dicquo import settings
+from django.conf import settings
 from web import views
 from web.sitemaps import DictumSitemap
 
@@ -28,7 +28,7 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    re_path(f'^{settings.ADMIN_URL}', admin.site.urls),
 
     re_path(r'^$', views.IndexView.as_view()),
     re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.DictumDetailView.as_view()),
