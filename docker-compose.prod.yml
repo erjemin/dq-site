@@ -11,7 +11,7 @@ services:
   # --- ОCНОВНОЙ СЕРВИС: DJANGO + GUNICORN + WHITENOISE ---
   web:
     # Имя контейнера
-    container_name: dq_app
+    container_name: dq-backend
 
     # 1. ОБРАЗ
     # В продакшене мы используем готовый, собранный образ из реестра (Gitea)
@@ -48,9 +48,9 @@ services:
              cp /app/dicquo/templates/static_500.html /app/public/media/errors/500.html &&
              gunicorn --workers 3 --bind 0.0.0.0:8000 dicquo.wsgi:application"
 
-    # 4. Проброс портов (Внешний Nginx -> localhost:8000)
+    # 4. Проброс портов (Внешний Nginx -> localhost:8010)
     ports:
-      - "8000:8000"
+      - "8010:8000"
 
     # 5. Тома (Volumes)
     volumes:
