@@ -65,6 +65,13 @@ class CommonContextMixin:
         # --- 1. ЛОГИКА ИСТОРИИ СЕССИИ (Предотвращение петель) ---
         seen_ids = request.session.get('seen_ids', [])
 
+        # Если мы переключили контекст (например, выбрали другой тег), имеет смысл сбросить историю?
+        # Или можно оставить, так как уникальность ID глобальна.
+        # Проблема: если seen_ids забит цитатами, а мы выбрали тег, где всего 2 цитаты,
+        # и они обе случайно оказались в seen_ids (потому что мы их видели раньше без тега),
+        # то exclude исключит всё.
+
+        # Решение: принудительно добавить текущую цитату, если её нет
         if dq.id not in seen_ids:
             seen_ids.append(dq.id)
             if len(seen_ids) > 100:
@@ -100,11 +107,38 @@ class CommonContextMixin:
         dq.save(update_fields=['iViewCounter'])
 
         # --- 6. ВЫБОР СЛЕДУЮЩЕЙ ЦИТАТЫ ---
+        # Сначала пробуем найти следующую цитату, которую мы еще не видели
         dq_next = queryset.exclude(id__in=seen_ids).order_by('?').first()
 
+        # Если таких нет (мы посмотрели все цитаты в этом контексте/теге)
         if dq_next is None:
-            request.session['seen_ids'] = []
+            # СБРОС ИСТОРИИ!
+            # Мы посмотрели всё, что было по этому фильтру. Начинаем круг заново.
+            # Но удалять ВСЮ историю сессии опасно (вдруг мы вернемся в общий список).
+            # Лучше локально для выбора следующей цитаты игнорировать историю,
+            # но возможно стоит очистить сессию, чтобы цикл начался чисто.
+
+            # Вариант: Очистить seen_ids, чтобы в следующий раз (на некст странице) список был пуст?
+            # Или просто выбрать любую КРОМЕ текущей?
+
             dq_next = queryset.exclude(id=dq.id).order_by('?').first()
+
+            # Если мы действительно прошли весь цикл по тегу, логично сбросить seen_ids,
+            # чтобы пользователь мог заново проходить этот список случайно, а не "застревать" на последних.
+            # Однако, очистка seen_ids здесь повлияет на глобальную сессию.
+            # Если тег "red" (2 цитаты), мы их посмотрели. seen_ids=[1,2].
+            # queryset=[1,2]. exclude -> []. dq_next=None.
+            # Fallback: exclude(current) -> [1] (если cur=2). dq_next=1.
+            # User goes to 1. seen_ids=[1,2] (set logic handles dupes/order? No, list appends).
+            # seen_ids=[1,2,1].
+            # Next request (dq=1). queryset=[1,2]. exclude([1,2,1]) -> []. dq_next=2.
+            # It loops 1-2-1-2.
+
+            # Чтобы разорвать этот малый круг и сделать его снова "случайным" (если там >2 элементов, но меньше 100),
+            # нужно очистить seen_ids, если мы уткнулись в конец списка.
+            # Но удалять нужно только те ID, которые принадлежат этому queryset? Сложно.
+            # Проще очистить всё, так как пользователь явно "наелся" текущим контекстом и пошел по второму кругу.
+            request.session['seen_ids'] = []
 
         if dq_next:
             context.update({"NEXT": dq_next.id})
@@ -160,8 +194,17 @@ class IndexView(CommonContextMixin, TemplateView):
         active_qs, _ = self.get_filtered_queryset()
 
         dq = None
+        seen_ids = self.request.session.get('seen_ids', [])
+
         if active_qs is not None:
-             dq = active_qs.order_by('?').first()
+             # Если мы в режиме фильтрации, тоже стараемся не показывать то, что уже видели
+             dq = active_qs.exclude(id__in=seen_ids).order_by('?').first()
+
+             # Если после фильтрации ничего не осталось (мы просмотрели все цитаты тега)
+             if dq is None:
+                 # Сбрасываем историю и берем любую
+                 self.request.session['seen_ids'] = []
+                 dq = active_qs.order_by('?').first()
 
         if dq is None:
             # Если тег не задан, или по тегу ничего не нашлось совсем
@@ -169,7 +212,6 @@ class IndexView(CommonContextMixin, TemplateView):
             active_qs = TbDictumAndQuotes.objects.all()
 
             # Случайная цитата (с учетом истории, чтобы главная страница тоже не зацикливалась)
-            seen_ids = self.request.session.get('seen_ids', [])
             dq = active_qs.exclude(id__in=seen_ids).order_by('?').first()
 
             if dq is None:
