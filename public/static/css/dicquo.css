@@ -120,16 +120,11 @@ header > nav > #stats-menu > a:hover {
 
 /* MAIN ARTICLE CONTENT */
 main {
-  /*justify-content: space-between;*/
-  /*align-items: center;*/
   padding: 1vh 8vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 60vh;
-  /*width: 90%;*/
-  /*max-width: 1200px;*/
-  /*margin: 0 auto;*/
 }
 
 main > article {

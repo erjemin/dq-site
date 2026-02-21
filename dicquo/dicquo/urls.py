@@ -42,4 +42,7 @@ if settings.DEBUG:
         path('500/', TemplateView.as_view(template_name="500.html")),
         path('403/', TemplateView.as_view(template_name="403.html")),
         path('400/', TemplateView.as_view(template_name="400.html")),
+        # Для проверки статических страниц ошибок (Nginx)
+        path('static_404/', TemplateView.as_view(template_name="static_404.html")),
+        path('static_500/', TemplateView.as_view(template_name="static_500.html")),
     ]

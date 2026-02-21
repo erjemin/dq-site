@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>500: Ошибка сервера</title>
-    <style>
-        body { background-color: #111; color: #ccc; font-family: Georgia, serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .container { max-width: 600px; padding: 20px; }
-        blockquote { font-size: 2em; margin: 0 0 20px 0; font-style: italic; line-height: 1.4; }
-        blockquote span { margin-left: -0.44em; }
-        cite { display: block; font-size: 0.9em; color: #777; margin-top: 15px; font-style: normal; }
-        a { color: #555; text-decoration: none; border-bottom: 1px dotted #555; transition: color 0.3s; font-size: 0.8em; margin-top: 30px; display: inline-block;}
-        a:hover { color: #999; border-bottom: 1px solid #999; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>500: Ошибка сервера | DicQuo</title>
+  <style>
+    body { margin: 0; min-height: 100vh; background-color: #211; color: silver; font-family: serif; opacity: 1; transition: opacity 0.9s ease-in-out; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1vh 4vw; }
+    header > #logo { margin-top: 1vh; float: left; }
+    header > #logo a { border: none; text-decoration: none; color: silver;}
+    main { padding: 1vh 8vw; display: flex; flex-direction: column; justify-content: center; min-height: 60vh; }
+    main > article { display: flex; align-items: center; justify-content: center; gap: 2vw; }
+    main > article > figure > p { color: silver; font-size: 3vmin; line-height: 3.5vmin; padding-bottom: 2vmin; font-style: italic; }
+    main > article > figure > blockquote { color: whitesmoke; font-size: 4.5vmin; line-height: 5vmin; border:none; margin:0; padding:0; }
+    main > article > figure > cite { color: silver; font-size: 3.5vmin; line-height: 4vmin; text-align: right; padding-top: 8vmin; font-style: italic; display: block; }
+    .tags { text-align: center; color: silver; font-size: 1.5vmin; line-height: 1.9vmin; padding: 1vh 8vw; float: left;}
+    .tags a { text-decoration: none; position: relative; padding: 0 0.5ex; display: inline-block; color: white; border-bottom: dotted 1px silver; background: linear-gradient(to right, rgba(255, 255, 255, 0.9) 40%, slategray, silver, lightyellow 50%, rgba(255, 255, 255, 0.4)); background-clip: initial; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 250% 100%; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)"; background-position: 100%; transition: background-position 0.65s ease; margin-right: 2vmin; }
+    .tags a:hover { color: white; background-position: 0 100%; border-bottom: solid 1px white; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <blockquote>
-            <span>«</span>Что-то пошло не&nbsp;так. Кажется, я&nbsp;уронил сервер, контейнер или &nbsp;случилось что-то ещё. Подождите, пока я&nbsp;его подниму.»
-        </blockquote>
-        <cite>Системный Администратор (5xx)</cite>
-        <a href="#" onclick="window.location.reload(); return false;">Попробовать обновить через 5&nbsp;минут.</a>
-    </div>
+<header>
+  <div id="logo">
+    <a href="/" style="font-size: 3em; font-weight: bold; color: orange; font-style: italic">DQ</a>
+  </div>
+</header>
+<main>
+  <article>
+    <figure>
+      <p>Неожиданно:</p>
+      <blockquote id="bb">
+        <span style="margin-left:-0.44em;">&laquo;</span>Что-то пошло не&nbsp;так. Кажется, я&nbsp;уронил сервер.
+        Подождите, пока я&nbsp;его подниму.»
+      </blockquote>
+      <cite>Системный Администратор (500)</cite>
+    </figure>
+  </article>
+</main>
+<div class="tags">
+  <a href="#" onclick="window.location.reload(); return false;">Попробовать обновить страницу</a>
+</div>
 </body>
 </html>
 
