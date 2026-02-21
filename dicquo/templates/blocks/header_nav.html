@@ -1,25 +1,15 @@
-{% load static %}
-<!-- ШАПКА: НАЧАЛО -->
-<div class="container">
-  <header>
-      <a href="/" id="logo">
-        <img src='{% static "svgs/dq-logo.svg" %}' alt="Dictum & Quotes" title="Dictum & Quotes"
-             width="50" height="46"/>
-      </a>
-      <div>
-        <span id="stats-menu" style="display: none; color: silver; font-size: 0.9em; margin-right: 15px; text-align: right;">
-          <!-- Манифест проекта -->
-          <div style="margin-bottom: 5px; color: #aaa; font-style: italic; max-width: 300px; display: inline-block;">
-             Dicquo&nbsp;— это коллекция отобранных вручную цитат, оформленных с&nbsp;уважением к&nbsp;типографике. Место для&nbsp;вдумчивого чтения.
-          </div>
-          <br/>
-          <!-- Статистика -->
-          {% if ticks %}<i class="stats-icon icon-time" title="Время генерации"></i>{{ ticks|floatformat:1 }}ms{% endif %}
-          {% if DQ %} &nbsp;|&nbsp; <i class="stats-icon icon-views" title="Просмотры"></i>{{ DQ.iViewCounter }}{% endif %}
-           &nbsp;|&nbsp; <a href="/add_quote/" style="color: silver; text-decoration: none;" title="Добавить цитату"><i class="stats-icon icon-add"></i></a> &nbsp;|&nbsp;
-        </span>
-        <a href="#" onclick="var m=document.getElementById('stats-menu'); m.style.display = (m.style.display === 'none' ? 'inline-block' : 'none'); return false;" style="color: silver; text-decoration: none; font-size: 1.2em;">≡</a>
-      </div>
+{% load static %}{# ШАПКА #}<header>
+    <a href="/" id="logo">
+      <img src='{% static "svgs/dq-logo.svg" %}' alt="Dictum & Quotes" title="Dictum & Quotes"/>
+    </a>
+    <nav>
+      <span id="stats-menu">
+        {# Манифест проекта #}<p>
+           DicQuo&nbsp;— это коллекция отобранных вручную цитат, оформленных с&nbsp;уважением к&nbsp;типографике.<br/>
+          Место для&nbsp;вдумчивого&nbsp;чтения.
+        </p>
+        {# МЕНЮ #}{% if ticks %}<i class="stats-icon icon-time" title="Время генерации"></i>{{ ticks|floatformat:3|default:"1,023" }} ms{% endif %}{% if DQ %} <b>|</b> <i class="stats-icon icon-views" title="Просмотры"></i> {{ DQ.iViewCounter }}{% endif %} <a href="/add_quote/" title="Добавить цитату">＋</a> &nbsp;
+      </span>
+      {# БУРГЕР #}<a href="#" onclick="var m=document.getElementById('stats-menu'); m.style.display = (m.style.display === 'none' ? 'inline-block' : 'none'); return false;" title="О проекте">≡</a>
+    </nav>
   </header>
-</div>
-<!-- ШАПКА: КОНЕЦ -->

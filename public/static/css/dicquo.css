@@ -1,143 +1,11 @@
 @charset "utf-8";
-
-.tags{
-  color: silver;
-  font-size:1.5vh;
-  line-height:1.9vh;
-  padding-top: 7vh;
-}
-
-/*****************************************************************
- * Настройки для анимирования цвета ссылок:
- * рецепт взят из: https://habr.com/ru/company/ruvds/blog/491702/
- *****************************************************************/
-.tags a {
-  text-decoration: none;
-  position: relative;
-  padding: 0 0.5ex;
-  display: inline-block;
-  color: white;
-  border-bottom: dotted 1px silver;
-  /* градиент для цвета ссылки */
-  background: linear-gradient(to right, rgba(255,255,255,0.9) 40%, slategray, silver, lightyellow 50%, rgba(255,255,255,0.4));
-  /*  обрезка градиента */
-  background-clip: initial;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 250% 100%;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
-  background-position: 100%;
-  /* плавное позиионирование градиента */
-  transition: background-position 0.65s ease;
-  margin-right: 2vh;
-}
-
-.tags a:hover {
-  color: white;
-  background-position: 0 100%;
-  border-bottom: solid 1px white;
-}
-
-div[name="cookies_accept"] {
-  font-family:'Roboto', 'Lucida Grande', Verdana, Arial, sans-serif;
-  position:fixed;
-  bottom: 0; left: 0;
-  width: 100%;
-  padding: 2vh 2vw;
-  color: black;
-  background-color: gray;
-  text-align: center;
-}
-
-div[name="cookies_accept"] button {
-  padding:0.5vh 0.5vw;
-  background: silver;
-  color: black;
-  margin-left: 2vw;
-  cursor: pointer;
-}
-
-#logo {
-  margin-top:1vh;
-  filter: alpha(Opacity=75); /* Полупрозрачность для IE */
-  opacity: 0.75;
-  float: left;
-}
-
-#logo a {
-  border: none;
-  text-decoration: none;
-}
-
-table { width: 80%; }
-
-#menu {
-  display: none;
-  color: silver;
-}
-
-#mm {
-  text-decoration: none;
-  color: silver;
-}
-
-#image {
-  width: 30vw;
-  text-align: center;
-  vertical-align: center;
-}
-
-#image > center > div {
-  width: 22vw;
-  height: 22vw;
-  padding:0.5vw;
-  border-radius: 50%;
-}
-
-#image > center > div > div {
-  border-radius:50%;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#image > center > div > div > img {
-  width: auto;
-  height: 22vw;
-}
-
-#author {
-  color: silver;
-  font-size: 3.5vh;
-  line-height: 4vh;
-  text-align: right;
-  padding-top: 4vh;
-  font-style: italic;
-}
-
-#info {
-  color: silver;
-  font-size: 2.5vh;
-  line-height: 3vh;
-  padding-bottom: 2vh;
-}
-
-#bb {
-  color: whitesmoke;
-  font-size: 4.5vh;
-  line-height: 5vh
-}
-
-#next { float: right; }
-
-#next a { border-bottom: none; }
-
-/* --- NEW STYLES for FLEXBOX LAYOUT --- */
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  background-color: #111; /* Изначально темный фон */
+  opacity: 0; /* Скрываем контент до расчета цвета */
+  transition: opacity 0.9s ease-in-out; /* Очень плавное появление */
 }
 
 /* Header */
@@ -145,46 +13,101 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1vh 0;
+  padding: 1vh 4vw;
 }
 
-/* Main Content Area */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 80vh;
+header > #logo {
+  margin-top: 1vh;
+  float: left;
 }
 
-.content-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2vw;
+header > #logo a {
+  border: none;
+  text-decoration: none;
 }
 
-.text-col {
-  flex: 1;
+header > #logo a > img {
+  width:50px;
+  height:46px;
 }
 
-.image-col {
-  flex: 0 0 30vw;
-  display: flex;
-  justify-content: center;
+header > nav {
+  border: #555555;
+  min-height: 50px;
 }
 
-/* --- Icons for Header Stats (SVG in Base64) --- */
-.stats-icon {
+header > nav > a { /* бургер */
+  color: silver;
+  text-decoration: none;
+  font-size: 1.2em;
+  padding: 0 0.5em;
+  margin-right: -0.5em;
+  border: solid 1px transparent;
+  transition: border-color 0.8s ease, color 0.8s ease;
+  vertical-align: top;
+}
+
+header > nav > a:hover {
+  color: white;
+  border: solid 1px silver;
+  transition: border-color 0.8s ease, color 0.8s ease;
+}
+
+header > nav > #stats-menu {
+  display: none;
+  color: silver;
+  font-size: 0.9em;
+  margin-right: 15px;
+  text-align: right;
+  vertical-align: top;
+}
+
+header > nav > #stats-menu > b {
+  font-weight: normal;
+  margin: 0 1ex;
+}
+
+header > nav > #stats-menu > p {
+  font-style: italic; display: inline-block;
+  margin: 0 1vw;
+  padding-right: 1vw;
+  border-right: 1px dotted silver;
+}
+
+header > nav > #stats-menu > i.stats-icon {
   display: inline-block;
   width: 0.9em;
   height: 0.9em;
   vertical-align: middle;
   background-size: contain;
   background-repeat: no-repeat;
-  margin-right: 0.2em;
+  margin-right: .2em;
   opacity: 0.7; /* Slight transparency for subtle look */
 }
 
+header > nav > #stats-menu > i.stats-icon.icon-views {
+  margin-left: .2em;
+}
+
+
+header > nav > #stats-menu > a {
+  color: silver;
+  text-decoration: none;
+  border: solid 1px gray;
+  border-radius: 2em;
+  padding: 1.5px 0.2em 0 0.2em;
+  margin-left: 1em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header > nav > #stats-menu > a:hover {
+  background-color: tan;
+  color: black;
+  border: solid 1px white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- Icons for Header Stats (SVG in Base64) --- */
 /* Clock Icon (Time) */
 .icon-time {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='silver' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
@@ -195,30 +118,194 @@ header {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='silver' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'%3E%3C/path%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3C/svg%3E");
 }
 
-/* Responsive: on mobile stack columns */
+/* MAIN ARTICLE CONTENT */
+main {
+  /*justify-content: space-between;*/
+  /*align-items: center;*/
+  padding: 1vh 8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60vh;
+  /*width: 90%;*/
+  /*max-width: 1200px;*/
+  /*margin: 0 auto;*/
+}
+
+main > article {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+}
+
+main > article > figure {
+  flex: 1;
+}
+
+main > article > figure > p { /* Интро/Вступление */
+  color: silver;
+  font-size: 3vmin;
+  line-height: 3.5vmin;
+  padding-bottom: 2vmin;
+  font-style: italic;
+}
+
+main > article > figure > blockquote { /* Цитата */
+  color: whitesmoke;
+  font-size: 4.5vmin;
+  line-height: 5vmin;
+  border:none;
+  margin:0;
+  padding:0;
+}
+
+main > article > figure > cite { /* Автор цитаты */
+  color: silver;
+  font-size: 3.5vmin;
+  line-height: 4vmin;
+  text-align: right;
+  padding-top: 4vmin;
+  font-style: italic;
+}
+
+main > article > div {
+  flex: 0 0 30vw;
+  display: flex;
+  justify-content: center;
+  width: 30vw;
+  text-align: right;
+  margin-bottom: 10vh;
+}
+
+main > article > div >  div {
+  width: 26vmax;
+  height: 26vmax;
+  padding: 0.5vw;
+  border-radius: 50%;
+}
+
+main > article > div  >  div > div {
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+main > article > div > div > div > img {
+  width: auto;
+  height: 26vmax;
+}
+
+/* НАВИГАЦИЯ (ТЕГИ И ДАЛЕЕ) В КОНЦЕ */
+nav {
+  padding: 1vh 4vw;
+}
+nav > div {
+  color: silver;
+  font-size: 1.5vmin;
+  line-height: 1.9vmin;
+  padding-top: 7vh;
+}
+nav > div a {
+  text-decoration: none;
+  position: relative;
+  padding: 0 0.5ex;
+  display: inline-block;
+  color: white;
+  border-bottom: dotted 1px silver;
+  /* градиент для цвета ссылки */
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.9) 40%, slategray, silver, lightyellow 50%, rgba(255, 255, 255, 0.4));
+  /*  обрезка градиента */
+  background-clip: initial;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 250% 100%;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+  background-position: 100%;
+  /* плавное позиионирование градиента */
+  transition: background-position 0.65s ease;
+  margin-right: 2vmin;
+}
+
+nav > div a:hover {
+  color: white;
+  background-position: 0 100%;
+  border-bottom: solid 1px white;
+}
+
+nav > div > div {
+  float: right;
+}
+
+nav > div > div a {
+  border-bottom: none;
+}
+
+/* --- ПОДВАЛ-КУКИ (ДЗЕН-СТИЛЬ) --- */
+footer {
+  font-family: 'Roboto', sans-serif;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 2vh 4vw;
+  color: silver; /* Мягкий серый цвет текста */
+  background-color: rgba(30, 30, 30, 0.8); /* Темный полупрозрачный фон */
+  backdrop-filter: blur(5px); /* Эффект матового стекла (современно и медитативно) */
+  text-align: center;
+  border-top: 1px solid #444; /* Тонкая грань */
+  font-size: 0.9em;
+  z-index: 1000; /* Чтобы точно было поверх всего */
+}
+
+footer small {
+  display: inline-block;
+  margin-right: 2vw;
+  letter-spacing: 0.05em; /* Немного воздуха в тексте */
+}
+
+footer button {
+  padding: 0.5vh 1.5vw;
+  background: transparent;
+  color: silver;
+  border: 1px solid silver;
+  border-radius: 2em; /* Округлые, мягкие формы */
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9em;
+  transition: all 0.4s ease;
+}
+
+footer button:hover {
+  background: silver;
+  color: #111;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Легкое свечение при наведении */
+}
+
+/* Отзывчивость: для мобильных устройств колонки свапаются */
 @media (max-width: 768px) {
-  .content-row {
+  main > article {
     flex-direction: column-reverse;
   }
-  .image-col {
+
+  main > article > div {
     flex: 0 0 auto;
     margin-bottom: 2vh;
   }
 }
 
 /* --- ВЫРАВНИВАНИЕ СИМВОЛОВ ВИСЯЧЕЙ ПУНКТУАЦИИ (Hanging Punctuation) ТИПОГРАФА ETPGRF --- */
-/* --- ЛЕВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по левому краю) --- */
-.etp-laquo { margin-left: -0.44em; }                /* « */
-.etp-ldquo, .etp-bdquo { margin-left: -0.4em; }  /* “ „ */
-.etp-lsquo { margin-left: -0.22em; }                /* ‘ */
-.etp-lpar, .etp-lsqb, .etp-lcub { margin-left: -0.25em; } /* ( [ { */
+/* --- В ПРОЕКТЕ ТОЛЬКО ЛЕВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по левому краю) --- */
+.etp-laquo {margin-left: -0.44em;} /* « */
+.etp-ldquo, .etp-bdquo { margin-left: -0.4em;} /* “ „ */
+.etp-lsquo {margin-left: -0.22em;} /* ‘ */
+.etp-lpar, .etp-lsqb, .etp-lcub {margin-left: -0.25em;}/* ( [ { */
 
-/* --- ПРАВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по правому краю) --- */
-/* Общая механика: "вырываем" символ из потока для идеального выравнивания текста */
-[class^="etp-r"], [class*=" etp-r"]  { position: absolute; }
-/* Точечная настройка смещения для каждого символа */
-.etp-raquo { right: -0.44em; }                /* » */
-.etp-rdquo { right: -0.4em; }                /* ” */
-.etp-rsquo { right: -0.22em; }                /* ’ */
-.etp-rpar, .etp-rsqb, .etp-rcub { right: -0.25em; } /* ) ] } */
-.etp-r-dot, .etp-r-comma, .etp-r-colon { right: -0.15em; } /* . , : */
+/* --- СЧЕТЧИКИ (СКРЫТЫЙ ПИКСЕЛЬ) --- */
+.counter-pixel {
+  border: 0;
+  position: absolute;
+  left: -9999px;
+}

@@ -13,84 +13,53 @@
 <!--- ТИТУЛ --->
 {% block Title %}{% if AUTHOR %}{{ AUTHOR.szAuthor }} — {% endif %}{{ DQ.szContent|truncatewords:7 }} | Dicquo{% endblock %}
 
-{% block ExtraHead %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Quotation",
-  "name": "Цитата #{{ DQ.id }}",
-  "text": "{{ DQ.szContent|escapejs }}",
-  "creator": {
-    "@type": "Person",
-    "name": "{% if AUTHOR %}{{ AUTHOR.szAuthor|escapejs }}{% else %}Неизвестный автор{% endif %}"
-  },
-  "url": "{{ request.build_absolute_uri }}",
-  {% if IMAGE %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}",{% endif %}
-  "keywords": "афоризмы, цитаты, {% for i in TAGS %}{{ i.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}",
-  "inLanguage": "ru",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "Dicquo",
-    "url": "{{ request.scheme }}://{{ request.get_host }}"
-  },
-  "dateCreated": "{{ DQ.dtCreated|date:'Y-m-d' }}",
-  "dateModified": "{{ DQ.dtEdited|date:'Y-m-d' }}"
-}
-</script>
-{% endblock %}
+{% block ExtraHead %}<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Quotation",
+      "name": "Цитата #{{ DQ.id }}",
+      "text": "{{ DQ.szContent|escapejs }}",
+      "creator": {
+        "@type": "Person",
+        "name": "{% if AUTHOR %}{{ AUTHOR.szAuthor|escapejs }}{% else %}Неизвестный автор{% endif %}"
+      },
+      "url": "{{ request.build_absolute_uri }}",
+      {% if IMAGE %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}",{% endif %}
+      "keywords": "афоризмы, цитаты, {% for i in TAGS %}{{ i.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}",
+      "inLanguage": "ru",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Dicquo",
+        "url": "{{ request.scheme }}://{{ request.get_host }}"
+      },
+      "dateCreated": "{{ DQ.dtCreated|date:'Y-m-d' }}",
+      "dateModified": "{{ DQ.dtEdited|date:'Y-m-d' }}"
+    }
+  </script>{% endblock %}
 
 
-{% block CONTENT %}{% include "blocks/header_nav.html" %}
-<div class="container main-content">
-  <!-- Основной контент: Текст + Картинка -->
-  <div class="content-row">
-
-    <!-- Текстовая колонка -->
-    <div class="text-col">
-        <!-- Интро/Вступление -->
-        {% if DQ.szIntroHTML %}
-        <div id="info">{{ DQ.szIntroHTML|safe }}</div>
-        {% endif %}
-
-        <!-- Цитата: Семантический blockquote -->
-        <blockquote id="bb" style="border:none; margin:0; padding:0;">
-            {{ DQ.szContentHTML|safe }}
-        </blockquote>
-
-        <!-- Автор: Семантический cite -->
-        <div id="author">
-            <cite>
-              {% if AUTHOR %}
-                {{ AUTHOR.szAuthorHTML|default:AUTHOR.szAuthor|safe }}
-              {% endif %}
-            </cite>
+{% block CONTENT %}<main>{# Основной контент: Текст + Картинка #}
+    <article>{# Текстовая ряб. Задает высоту двум колонкам: текст и картина #}
+      <figure>{# КОЛОНКА С ТЕКСТОМ #}{% if DQ.szIntroHTML %}
+        {# Интро/Вступление (например "Вася Пупкин как-то сказа". Может отсутствовать #}<p>{{ DQ.szIntroHTML|safe }}</p>{% endif %}
+        <blockquote>{{ DQ.szContentHTML|safe }}</blockquote>{% if AUTHOR %}
+        <cite>{# Автор #}{{ AUTHOR.szAuthorHTML|default:AUTHOR.szAuthor|safe }}</cite>{% endif %}
+      </figure>{% if IMAGE %}
+      <div>{# КОЛОНКА С КАРТИНКОЙ #}
+        <div style="background:rgba(87,0,0,0.7);">
+         <div>
+           <img src="{{IMAGE.url}}" alt="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" title="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" />
+         </div>
         </div>
-    </div>
-
-    <!-- Колонка с картинкой (если есть) -->
-    {% if IMAGE %}
-    <div class="image-col" id="image">
-        <center>
-          <div style="background:rgba(87,0,0,0.7);">
-             <div><img src="{{IMAGE.url}}" alt="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" title="{% if AUTHOR %}{{ AUTHOR.szAuthor }}{% else %}Dictum & Quotes{% endif %}" /></div>
-          </div>
-        </center>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- Блок тегов и навигации -->
-  <div class="tags">
-      {% for i in TAGS %}<a href="/?tag={{ i.slug }}">{{ i.name|safe }}</a> {% endfor %}
+      </div>{% endif %}
+    </article>
+  </main>
+  <nav>
+    <div>{# ТЕГИ #}{% for i in TAGS %}
+      <a href="/?tag={{ i.slug }}">{{ i.name|safe }}</a> {% endfor %}
       <div id="next"><a href="/{{ NEXT }}_{{ NEXT_TXT }}{% if CURRENT_TAG %}?tag={{ CURRENT_TAG }}{% endif %}">&rightarrow;</a></div>
-  </div>
-</div>
-
-
-<noscript>
-   <meta http-equiv="refresh" content="15; url=/{{ NEXT}}_{{ NEXT_TXT }}{% if CURRENT_TAG %}?tag={{ CURRENT_TAG }}{% endif %}">
-</noscript>
-
-
-{% if not cookie_accept %}{% include "blocks/cookie_warning.html" %}{% endif %}
-{% endblock %}
+    </div>
+  </nav>
+  <noscript>
+    <meta http-equiv="refresh" content="15; url=/{{ NEXT}}_{{ NEXT_TXT }}{% if CURRENT_TAG %}?tag={{ CURRENT_TAG }}{% endif %}">
+  </noscript>{% endblock %}
