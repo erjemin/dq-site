@@ -26,3 +26,17 @@ _tmr.push({id: "3744288", type: "pageView", start: (new Date()).getTime()});
   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
 })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106953063', 'ym');
 ym(106953063, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+// Google Analytics (GA4) counter
+(function() {
+  var gaScript = document.createElement('script');
+  gaScript.async = true;
+  gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-WTJM8J9YL5';
+  document.head.appendChild(gaScript);
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  // Делаем функцию глобально доступной, если понадобится вызывать её из других скриптов
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-WTJM8J9YL5');
+})();
