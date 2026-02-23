@@ -106,8 +106,8 @@ services:
       - REPO_PASS=${REPO_PASS}
       - WATCHTOWER_SCOPE=dq-scope
       - WATCHTOWER_CLEANUP=true # Удалять старые образы после обновления
-      - WATCHTOWER_POLL_INTERVAL=1800 # Проверять каждые 30 минут
       - DOCKER_API_VERSION=1.44
+    command: --interval 1800 --cleanup # Проверять каждые 30 минут
     logging:
         driver: "json-file"
         options:
