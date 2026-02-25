@@ -7,6 +7,7 @@ from django_select2.forms import Select2TagWidget
 from taggit.models import Tag
 from taggit.utils import parse_tags
 from django.db import models
+from django.db.utils import OperationalError, ProgrammingError
 
 try:
     from etpgrf.typograph import Typographer
@@ -34,8 +35,13 @@ class TagSelect2Widget(Select2TagWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # choices: список всех существующих тегов по имени
-        self.choices = [(t.name, t.name) for t in Tag.objects.all()]
+        # choices: список всех существующих тегов по имени.
+        # Важно: на этапах вроде collectstatic таблицы taggit ещё может не быть,
+        # поэтому оборачиваем в try/except и молча игнорируем отсутствие БД.
+        try:
+            self.choices = [(t.name, t.name) for t in Tag.objects.all()]
+        except (OperationalError, ProgrammingError):
+            self.choices = []
 
     class Media:
         css = {
