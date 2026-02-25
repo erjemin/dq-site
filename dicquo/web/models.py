@@ -16,6 +16,7 @@ import pytils
 class RuTag(Tag):
     class Meta:
         proxy = True
+        # ordering = ['id']
 
     def slugify(self, tag, i=None):
         return pytils.translit.slugify(self.name.lower())[:128]
@@ -24,6 +25,7 @@ class RuTag(Tag):
 class RuTaggedItem(TaggedItem):
     class Meta:
         proxy = True
+        # ordering = ['id']
 
     @classmethod
     def tag_model(cls):
@@ -108,7 +110,73 @@ class TbImages(models.Model):
 
     # заменим имя файла картинки
     def save(self, *args, **kwargs):
-        self.imFile.name = pytils.translit.slugify(self.szCaption.lower()) + str(Path(self.imFile.name).suffixes)
+        import os
+        from django.conf import settings
+
+        old_obj = None
+        old_file_path = None
+
+        # Получаем старую запись, если она есть
+        if self.pk:
+            try:
+                old_obj = TbImages.objects.get(pk=self.pk)
+                # Пытаемся получить путь к файлу. Если файл не найден физически, Django может выкинуть ошибку здесь или позже
+                # Поэтому просто берем имя из БД и формируем путь руками, чтобы не зависеть от Storage
+                if old_obj.imFile:
+                     old_file_path = os.path.join(settings.MEDIA_ROOT, str(old_obj.imFile.name))
+            except TbImages.DoesNotExist:
+                pass
+
+        # Fix 1: Если старый путь уже битый (содержит ['...'])
+        if old_file_path and "['" in old_file_path:
+             # Формируем "исправленный" путь (каким он должен быть)
+             corrected_path = old_file_path.replace("['", "").replace("']", "").replace("'", "")
+
+             # Проверяем: если битого файла нет, а исправленный есть -> значит БД врет
+             if not os.path.exists(old_file_path) and os.path.exists(corrected_path):
+                 # Исправляем текущее имя файла в объекте (убираем мусор из имени)
+                 self.imFile.name = str(self.imFile.name).replace("['", "").replace("']", "").replace("'", "")
+                 # Обновляем переменную old_file_path, чтобы дальнейшая логика переименования работала корректно
+                 old_file_path = corrected_path
+
+        # Получаем текущее имя и расширение (уже возможно исправленное выше)
+        current_path = Path(str(self.imFile.name))
+        current_suffix = current_path.suffix
+
+        # Fix 2: Чиним расширение еще раз (на всякий случай, если Fix 1 не сработал или это новый объект)
+        if "['" in str(current_suffix):
+             current_suffix = str(current_suffix).replace("['", "").replace("']", "").replace("'", "")
+
+        # Формируем новое имя файла на основе заголовка (Slug)
+        new_filename = pytils.translit.slugify(self.szCaption.lower()) + current_suffix
+
+        # Определяем папку (если есть родитель, используем его, иначе img2)
+        # Важно: self.imFile.name может содержать полный путь. Нам нужен только относительный от MEDIA_ROOT
+        # Но проще взять родителя из текущего имени
+        parent_dir = current_path.parent.name if current_path.parent.name else 'img2'
+        new_name_with_path = str(Path(parent_dir) / new_filename)
+
+        # Переименование физического файла
+        # Сравниваем старое имя (из БД) с новым (сгенерированным)
+        if old_obj and str(old_obj.imFile.name) != new_name_with_path:
+             new_file_full_path = os.path.join(settings.MEDIA_ROOT, new_name_with_path)
+
+             # Если старый файл (old_file_path) существует физически, переименовываем его
+             if old_file_path and os.path.exists(old_file_path):
+                 try:
+                    os.makedirs(os.path.dirname(new_file_full_path), exist_ok=True)
+                    os.rename(old_file_path, new_file_full_path)
+                    self.imFile.name = new_name_with_path
+                 except OSError as e:
+                     print(f"Error renaming file from {old_file_path} to {new_file_full_path}: {e}")
+             else:
+                 # Если старого файла нет, просто обновляем имя в БД
+                 self.imFile.name = new_name_with_path
+        else:
+             # Если имя не менялось или объекта не было, просто устанавливаем правильное имя
+             # (например, чтобы убрать мусор из расширения в БД)
+             self.imFile.name = new_name_with_path
+
         super(TbImages, self).save(*args, **kwargs)
 
     class Meta:

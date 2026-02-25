@@ -1,0 +1,60 @@
+/* Select2 (django-select2) dark theme compatibility for Django Admin.
+   We intentionally scope to dark mode only and lean on Django Admin CSS variables. */
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .select2-container--default .select2-selection--single,
+  html:not([data-theme="light"]) .select2-container--default .select2-selection--multiple {
+    background: var(--body-bg, #1e1e1e) !important;
+    color: var(--body-fg, #e6e6e6) !important;
+    border-color: var(--border-color, #3a3a3a) !important;
+  }
+}
+
+html[data-theme="dark"] .select2-container--default .select2-selection--single,
+html[data-theme="dark"] .select2-container--default .select2-selection--multiple {
+  background: var(--body-bg, #1e1e1e) !important;
+  color: var(--body-fg, #e6e6e6) !important;
+  border-color: var(--border-color, #3a3a3a) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-selection__rendered {
+  color: var(--body-fg, #e6e6e6) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-search--inline .select2-search__field,
+html[data-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+  background: transparent !important;
+  color: var(--body-fg, #e6e6e6) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: var(--body-fg, #e6e6e6) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: var(--body-fg, #e6e6e6) !important;
+  opacity: 0.8;
+}
+
+html[data-theme="dark"] .select2-dropdown {
+  background: var(--body-bg, #1e1e1e) !important;
+  color: var(--body-fg, #e6e6e6) !important;
+  border-color: var(--border-color, #3a3a3a) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-results__option {
+  color: var(--body-fg, #e6e6e6) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: var(--body-fg, #ffffff) !important;
+}
+
+html[data-theme="dark"] .select2-container--default .select2-results__option--selected {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--body-fg, #e6e6e6) !important;
+}
+

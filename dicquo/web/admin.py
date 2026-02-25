@@ -2,6 +2,11 @@
 from django.contrib import admin
 from django import forms
 from web.models import TbDictumAndQuotes, TbAuthor, TbImages, TbOrigin
+from taggit.managers import TaggableManager
+from django_select2.forms import Select2TagWidget
+from taggit.models import Tag
+from taggit.utils import parse_tags
+from django.db import models
 
 try:
     from etpgrf.typograph import Typographer
@@ -16,6 +21,96 @@ except ImportError:
         def __init__(self, **kwargs): pass
     class Hyphenator:
          def __init__(self, **kwargs): pass
+
+
+class TagSelect2Widget(Select2TagWidget):
+    """
+    Select2-виджет для django-taggit, работающий по ИМЕНАМ тегов.
+
+    - подхватывает уже сохранённые теги;
+    - показывает выпадающий список из существующих тегов;
+    - даёт создавать новые теги с пробелами в названии.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # choices: список всех существующих тегов по имени
+        self.choices = [(t.name, t.name) for t in Tag.objects.all()]
+
+    class Media:
+        css = {
+            "all": ("css/select2_taggit_admin.css",),
+        }
+
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        """
+        Настраиваем Select2 так, чтобы пробел НЕ разделял тег
+        на несколько частей (нужны теги с пробелами: «Сергей Курёхин»).
+        Оставляем в разделителях только запятую.
+        """
+        attrs = super().build_attrs(base_attrs, extra_attrs)
+        # По умолчанию django-select2 ставит: [",", " "]
+        # Нам нужен только разделитель-запятая.
+        # Строка '[","]' — корректный JSON-массив из одного элемента.
+        # Важно: сюда нужно класть СТРОКУ с JSON-массивом, а не python-список.
+        # Иначе в HTML окажется "['[\", \"]', ...]" и Select2 будет вести себя непредсказуемо.
+        attrs["data-token-separators"] = '[","]'
+        return attrs
+
+    def format_value(self, value):
+        """
+        Преобразуем значение из TaggableManager/TagField
+        в список ИМЁН тегов, который ожидает Select2TagWidget.
+        """
+        from django.db.models import QuerySet
+
+        if value is None:
+            return []
+
+        # QuerySet или список Tag-объектов
+        if isinstance(value, QuerySet):
+            return [t.name for t in value]
+        if isinstance(value, (list, tuple, set)):
+            names = []
+            for v in value:
+                if isinstance(v, Tag):
+                    names.append(v.name)
+                else:
+                    names.append(str(v))
+            return names
+
+        # Строка вида "tag1, tag2" — разбираем в список имён
+        if isinstance(value, str):
+            return parse_tags(value)
+
+        return super().format_value(value)
+
+    def value_from_datadict(self, data, files, name):
+        """
+        Django-Select2 возвращает список значений (['Сергей Курёхин', 'Другой тег']).
+        Taggit (TagField) ждёт ОДНУ строку, которую потом парсит в список тегов.
+        Если отдать список, он превратится в строку `"['Сергей', 'Курёхин']"`,
+        и распарсится в кривые теги — этого мы избегаем.
+        """
+        values = super().value_from_datadict(data, files, name)
+        if not values:
+            return ""
+
+        # Для нашего виджета value — это уже список имён тегов
+        tag_names = [str(v).strip() for v in values if str(v).strip()]
+        if not tag_names:
+            return ""
+
+        # ОДИН многословный тег: "Сергей Курёхин" -> "Сергей Курёхин,"
+        # Тогда parse_tags переключится в режим "деление по запятым"
+        if len(tag_names) == 1:
+            single = tag_names[0]
+            if " " in single and "," not in single and '"' not in single:
+                return single + ","
+            return single
+
+        # Несколько тегов — явная запятая между ними.
+        return ", ".join(tag_names)
 
 
 class DictumAdminForm(forms.ModelForm):
@@ -62,6 +157,9 @@ class DictumAdminForm(forms.ModelForm):
     class Meta:
         model = TbDictumAndQuotes
         fields = '__all__'
+        widgets = {
+            'tags': TagSelect2Widget,
+        }
 
 
 # Register your models here.
@@ -99,6 +197,10 @@ class AdmDictumAndQuotesAdmin(admin.ModelAdmin):
         })
     )
     readonly_fields = ('szIntroHTML', 'szContentHTML', 'iViewCounter')
+
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': Select2TagWidget},
+    }
 
     def save_model(self, request, obj, form, change):
         # 1. Читаем базовые настройки
@@ -199,6 +301,11 @@ class AdmImages(admin.ModelAdmin):
     list_display_links = ('id', 'szCaption')
     empty_value_display = u"<b style='color:red;'>-empty-</b>"
 
+    # Добавляем виджет для тегов
+    formfield_overrides = {
+        TaggableManager: {'widget': TagSelect2Widget},
+    }
+
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('tags')
 
@@ -212,6 +319,11 @@ class AdmAuthor(admin.ModelAdmin):
     list_display_links = ('id', 'szAuthor')
     empty_value_display = u"<b style='color:red;'>-empty-</b>"
 
+    # Добавляем виджет для тегов
+    formfield_overrides = {
+        TaggableManager: {'widget': TagSelect2Widget},
+    }
+
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('tags')
 
@@ -223,4 +335,3 @@ admin.site.register(TbDictumAndQuotes, AdmDictumAndQuotesAdmin)
 admin.site.register(TbOrigin, AdmOrigin)
 admin.site.register(TbImages, AdmImages)
 admin.site.register(TbAuthor, AdmAuthor)
-

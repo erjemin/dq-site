@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
@@ -33,6 +33,7 @@ urlpatterns = [
     re_path(r'^$', views.IndexView.as_view()),
     re_path(r'^(?P<dq_id>\d{1,12})_\S*$', views.DictumDetailView.as_view()),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path("select2/", include("django_select2.urls")),
 ]
 
 if settings.DEBUG:

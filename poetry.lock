@@ -68,6 +68,20 @@ argon2 = ["argon2-cffi (>=23.1.0)"]
 bcrypt = ["bcrypt (>=4.1.1)"]
 
 [[package]]
+name = "django-appconf"
+version = "1.2.0"
+description = "A helper class for handling configuration defaults of packaged apps gracefully."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "django_appconf-1.2.0-py3-none-any.whl", hash = "sha256:b81bce5ef0ceb9d84df48dfb623a32235d941c78cc5e45dbb6947f154ea277f4"},
+    {file = "django_appconf-1.2.0.tar.gz", hash = "sha256:15a88d60dd942d6059f467412fe4581db632ef03018a3c183fb415d6fc9e5cec"},
+]
+
+[package.dependencies]
+django = "*"
+
+[[package]]
 name = "django-environ"
 version = "0.12.1"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
@@ -82,6 +96,21 @@ files = [
 develop = ["coverage[toml] (>=5.0a4)", "furo (>=2024.8.6)", "pytest (>=4.6.11)", "setuptools (>=71.0.0)", "sphinx (>=5.0)", "sphinx-notfound-page"]
 docs = ["furo (>=2024.8.6)", "sphinx (>=5.0)", "sphinx-notfound-page"]
 testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)", "setuptools (>=71.0.0)"]
+
+[[package]]
+name = "django-select2"
+version = "8.4.8"
+description = "This is a Django_ integration of Select2_."
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "django_select2-8.4.8-py3-none-any.whl", hash = "sha256:a2ce6a4c556dd2d4d57eb3753618d6f31f8d3910e9d9fa1b686d9340f50b14eb"},
+    {file = "django_select2-8.4.8.tar.gz", hash = "sha256:592e52effff2b5850cb7c98b265715b6704fb784699c4aedddfdd8ae1ffa1e81"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+django-appconf = ">=0.6.0"
 
 [[package]]
 name = "django-taggit"
@@ -646,4 +675,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "3d7a7f2fe8ec78993616e707e29e96503f134bd1cec48cac7f6dd47814863f4f"
+content-hash = "b5fca935982220439294d6b37caaf1d893492df96d65abd6389dfd3c9464b992"

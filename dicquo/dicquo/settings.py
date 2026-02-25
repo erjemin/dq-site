@@ -58,6 +58,7 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'taggit.apps.TaggitAppConfig',
+    'django_select2',
     'web.apps.WebConfig',
 ]
 
@@ -78,6 +79,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR.parent / 'database/db.sqlite3',
+        'OPTIONS': {
+            # Таймаут ожидания блокировки SQLite (в секундах)
+            # При сложных операциях (например, каскадное удаление тегов) нужно больше времени
+            'timeout': 20,
+        },
     }
 }
 
