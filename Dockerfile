@@ -58,9 +58,11 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 # Копируем исходный код проекта и устанавливаем правильного владельца
 COPY --chown=app:app . .
 
-# Создаём директорию для собранной статики и даём права пользователю app
+# Создаём директорию для конфигов nginx и даём права пользователю app
 # Это выполняется ещё от root, поэтому проблем с permissions не будет.
-# После этого переключаемся на app для остальных операций.
+RUN mkdir -p /nginx_configs_host/nginx && chown -R app:app /nginx_configs_host
+
+# Создаём директорию для собранной статики и даём права пользователю app
 RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticfiles
 
 # Переключаемся на пользователя без прав root
