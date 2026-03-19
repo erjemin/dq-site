@@ -67,7 +67,7 @@ RUN mkdir -p /nginx_configs_host/nginx
 # Создаём директорию для собранной статики
 RUN mkdir -p /home/app/web/staticfiles
 # ...и даём права пользователю app
-# RUN chown -R app:app /home/app/web/staticfiles
+RUN chown -R app:app /home/app/web/staticfiles
 
 # Переключаемся на пользователя без прав root
 USER app
