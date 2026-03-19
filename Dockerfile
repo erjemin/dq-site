@@ -72,6 +72,10 @@ RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticf
 # Создаём директорию для ошибок (404, 500) и даём права пользователю app
 RUN mkdir -p /app/public/media/errors && chown -R app:app /app/public/media
 
+# Создаём директорию для БД и даём права пользователю app
+# Это важно когда БД монтируется как том с хоста
+RUN mkdir -p /app/database && chown -R app:app /app/database
+
 # Переключаемся на пользователя без прав root
 USER app
 
