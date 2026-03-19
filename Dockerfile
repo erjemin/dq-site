@@ -1,63 +1,85 @@
-# ==========================================
-# Dockerfile для Django + Gunicorn + WhiteNoise
-# ==========================================
+# =================================================
+# STAGE 1: Builder - Установка зависимостей
+# =================================================
+FROM python:3.12-slim as builder
 
-# 1. Базовый образ: Python 3.12 (Slim версия для меньшего размера)
-FROM python:3.12-slim
-
-# 2. Переменные окружения для Python
-# PYTHONDONTWRITEBYTECODE: Запрещает Python писать .pyc файлы
-# PYTHONUNBUFFERED:        Гарантирует, что вывод консоли (logs) виден сразу (не буферизуется)
+# Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-# Poetry настройки: не создавать виртуальное окружение внутри контейнера (ставим системно).
-# Дублирует `poetry config virtualenvs.create false` в пп.7 (на всякий случай).
+# Говорим Poetry, чтобы он не создавал venv, а ставил пакеты в системный site-packages
 ENV POETRY_VIRTUALENVS_CREATE=false
-# Путь настройки Django (по умолчанию для production) на случай если контейнер будет запущен не через docker-compose.
-ENV DJANGO_SETTINGS_MODULE=dicquo.settings
 
-# 3. Рабочая директория внутри контейнера
-WORKDIR /app
-
-# 4. Установка системных зависимостей
-# - libjpeg-dev zlib1g-dev: библиотеки для работы с изображениями (Pillow)
+# Устанавливаем системные зависимости, необходимые для СБОРКИ пакетов (например, Pillow)
+# build-essential нужен для компиляции, -dev пакеты для сборки Pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     libjpeg-dev \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Установка Poetry через pip (быстро и надежно)
+# Устанавливаем Poetry
 RUN pip install --no-cache-dir poetry
 
-# 6. Копируем файлы зависимостей (pyproject.toml и poetry.lock)
-# Делаем это ДО копирования всего кода, чтобы использовать кэш Docker layers.
+# Создаем рабочую директорию
+WORKDIR /app
+
+# Копируем только файлы зависимостей для кэширования этого слоя
 COPY pyproject.toml poetry.lock /app/
 
-# 7. Установка зависимостей проекта
-# --no-interaction: не будет спрашивать подтверждения
-# --no-ansi: уберваем цветные символы из логов сборки (они иногда мусорят)
-# --no-root: не устанавливать сам проект как пакет (мы просто копируем код)
-# --only main: не ставить dev-зависимости (тесты, линтеры и т.п.) для продакшена
-# RUN poetry install --no-root --only main
-# Настройка Poetry: не создавать venv и установка зависимостей (без dev-зависимостей для продакшена)
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root --only main
+# Устанавливаем зависимости проекта. Poetry установит их в /usr/local/lib/python3.12/site-packages
+RUN poetry install --no-interaction --no-ansi --no-root --only main
 
-# 8. Копируем весь исходный код проекта в контейнер
-COPY . /app/
 
-# 9. Сборка статики (CSS, JS)
-# Важно: Запускаем collectstatic с фейковым SECRET_KEY, так как на этапе сборки env файла может не быть.
-RUN SECRET_KEY=dummy_build_key python dicquo/manage.py collectstatic --noinput --clear
+# =================================================
+# STAGE 2: Final - Создание чистого и безопасного образа
+# =================================================
+FROM python:3.12-slim
 
-# 10. Открываем порт 8000
+# Устанавливаем переменные окружения
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=dicquo.settings
+
+# Устанавливаем только RUNTIME системные зависимости.
+# Пакеты -dev и build-essential здесь не нужны.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libjpeg62-turbo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создаем пользователя без прав root для безопасности
+RUN addgroup --system app && adduser --system --ingroup app app
+
+# Создаем рабочую директорию
+WORKDIR /home/app/web
+
+# Копируем установленные Python-пакеты из builder-стадии
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+
+# Копируем исходный код проекта и устанавливаем правильного владельца
+COPY --chown=app:app . .
+
+# Переключаемся на пользователя без прав root
+USER app
+
+# Собираем статику
+# Используем dummy ключ, так как .env файла нет на этапе сборки
+RUN SECRET_KEY=dummy python dicquo/manage.py collectstatic --noinput --clear
+
+# Открываем порт
 EXPOSE 8000
 
-# 11. Команда запуска
-# Переходим в подпапку dicquo, где лежит код Django проекта
-WORKDIR /app/dicquo
+# Проверка здоровья контейнера
+# Docker будет периодически проверять, жив ли контейнер, отправляя GET запрос к главной странице.
+# Параметры:
+#   --interval=30s    - проверка каждые 30 секунд
+#   --timeout=3s      - ожидаем ответ максимум 3 секунды
+#   --start-period=10s - даем контейнеру 10 секунд на запуск перед первой проверкой
+#   --retries=3       - объявляем контейнер unhealthy после 3 неудачных попыток
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()" || exit 1
 
-# Запускаем Gunicorn (по умолчанию, если не переопределено в docker-compose) на три воркера, привязывая его к
-# порту 8000 и указывая на точку входа приложения (wsgi.py).
+# Переходим в директорию с manage.py для корректного запуска gunicorn
+WORKDIR /home/app/web/dicquo
+
+# Команда запуска
 CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "dicquo.wsgi:application"]
-

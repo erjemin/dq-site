@@ -76,14 +76,24 @@ services:
       # Передаем переменную с путем на хосте внутрь контейнера, чтобы sed мог её использовать
       - HOST_PROJECT_PATH=${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}
 
-    # 7. Логирование (Ротация)
+    # 7. Проверка здоровья контейнера (Healthcheck)
+    # Docker будет периодически проверять статус контейнера. Это критично для Watchtower!
+    # Если контейнер объявлен "unhealthy", Watchtower сначала остановит старый образ, потом запустит новый.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()"]
+      interval: 30s        # Проверка каждые 30 секунд
+      timeout: 3s          # Таймаут ответа - 3 секунды
+      start_period: 10s    # Даем 10 секунд на стартап перед первой проверкой
+      retries: 3           # Unhealthy после 3 неудачных попыток
+
+    # 8. Логирование (Ротация)
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-    # 8. Ресурсы
+    # 9. Ресурсы
     deploy:
       resources:
         limits:
@@ -107,6 +117,9 @@ services:
       - WATCHTOWER_SCOPE=dq-scope
       - WATCHTOWER_CLEANUP=true # Удалять старые образы после обновления
       - DOCKER_API_VERSION=1.44
+      # Дополнительные опции для правильной работы с healthcheck
+      - WATCHTOWER_WAIT_ON_TIMEOUT=60  # Ждем 60 сек пока контейнер станет healthy перед финализацией
+      - WATCHTOWER_LIFECYCLE_HOOKS=true # Включаем lifecycle hooks для graceful shutdown
     command: --interval 1800 --cleanup # Проверять каждые 30 минут
     logging:
         driver: "json-file"
