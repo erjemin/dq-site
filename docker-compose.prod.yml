@@ -38,7 +38,7 @@ services:
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
              mkdir -p /nginx_configs_host/nginx &&
-             sed \"s|/home/user/app/dq-site|${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}|g\" /home/app/web/config/nginx/dq-app--external-nginx.conf > /nginx_configs_host/nginx/nginx_dq.conf.example &&
+             sed \"s|/home/user/app/dq-site|${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}|g\" /nginx_configs_host/nginx/dq-app--external-nginx.conf > /nginx_configs_host/nginx/nginx_dq.conf.example &&
              if [ ! -f /nginx_configs_host/nginx/dq-app--external-nginx.conf ]; then
                  cp /nginx_configs_host/nginx/nginx_dq.conf.example /nginx_configs_host/nginx/dq-app--external-nginx.conf;
                  echo 'INIT: Created new nginx config with correct paths';
@@ -63,9 +63,9 @@ services:
       # Медиа (папка media должна быть рядом с docker-compose.yml)
       - ./media:/app/public/media
 
-      # Конфиги (Монтируем папку ./config с хоста в /nginx_configs_host внутри контейнера)
+      # Конфиги (Монтируем папку ./configs с хоста в /nginx_configs_host внутри контейнера)
       # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
-      - ./config:/nginx_configs_host
+      - ./configs:/nginx_configs_host
 
     # 6. Переменные окружения
     env_file:
