@@ -60,14 +60,10 @@ COPY --chown=app:app . .
 
 # Создаём директорию для конфигов nginx и даём права пользователю app
 # Это выполняется ещё от root, поэтому проблем с permissions не будет.
-RUN mkdir -p /nginx_configs_host/nginx
-# ...и даём права пользователю app
-# RUN chown -R app:app /nginx_configs_host
+RUN mkdir -p /nginx_configs_host/nginx && chown -R app:app /nginx_configs_host
 
-# Создаём директорию для собранной статики
-RUN mkdir -p /home/app/web/staticfiles
-# ...и даём права пользователю app
-RUN chown -R app:app /home/app/web/staticfiles
+# Создаём директорию для собранной статики и даём права пользователю app
+RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticfiles
 
 # Переключаемся на пользователя без прав root
 USER app

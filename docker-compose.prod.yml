@@ -63,9 +63,9 @@ services:
       # Медиа (папка media должна быть рядом с docker-compose.yml)
       - ./media:/app/public/media
 
-      # Конфиги (Монтируем папку ./configs с хоста в /nginx_configs_host внутри контейнера)
+      # Конфиги (Монтируем папку ./config с хоста в /nginx_configs_host внутри контейнера)
       # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
-      - ./configs:/nginx_configs_host
+      - ./config:/nginx_configs_host
 
     # 6. Переменные окружения
     env_file:
