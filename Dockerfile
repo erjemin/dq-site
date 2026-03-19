@@ -55,6 +55,9 @@ WORKDIR /home/app/web
 # Копируем установленные Python-пакеты из builder-стадии
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
+# Копируем исполняемые файлы (gunicorn, pip и т.д.)
+COPY --from=builder /usr/local/bin /usr/local/bin
+
 # Копируем исходный код проекта и устанавливаем правильного владельца
 COPY --chown=app:app . .
 
