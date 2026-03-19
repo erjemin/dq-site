@@ -63,3 +63,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # ДОБАВЛЕНО:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # И это для медленного интернета:
+          timeout: 900  # 15 минут на всю сборку
