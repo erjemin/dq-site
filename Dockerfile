@@ -1,7 +1,7 @@
 # =================================================
 # STAGE 1: Builder - Установка зависимостей
 # =================================================
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 # Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -33,7 +33,7 @@ RUN poetry install --no-interaction --no-ansi --no-root --only main
 # =================================================
 # STAGE 2: Final - Создание чистого и безопасного образа
 # =================================================
-FROM python:3.12-slim
+FROM python:3.12-slim AS stage-final
 
 # Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -60,6 +60,11 @@ COPY --chown=app:app . .
 
 # Переключаемся на пользователя без прав root
 USER app
+
+# Создаем папку для собранной статики с правильными правами владельца
+# Это КРИТИЧНО, т.к. collectstatic попытается создать её и написать туда файлы.
+# Без этой папки (и без прав на её создание) collectstatic упадет с PermissionError.
+RUN mkdir -p /home/app/web/staticfiles
 
 # Собираем статику
 # Используем dummy ключ, так как .env файла нет на этапе сборки
