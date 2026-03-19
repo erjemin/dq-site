@@ -65,6 +65,9 @@ RUN mkdir -p /nginx_configs_host/nginx && chown -R app:app /nginx_configs_host
 # Создаём директорию для собранной статики и даём права пользователю app
 RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticfiles
 
+# Создаём директорию для ошибок (404, 500) и даём права пользователю app
+RUN mkdir -p /app/public/media/errors && chown -R app:app /app/public/media
+
 # Переключаемся на пользователя без прав root
 USER app
 
