@@ -58,13 +58,14 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 # Копируем исходный код проекта и устанавливаем правильного владельца
 COPY --chown=app:app . .
 
+# Создаём директорию для собранной статики и даём права пользователю app
+# Это выполняется ещё от root, поэтому проблем с permissions не будет.
+# После этого переключаемся на app для остальных операций.
+RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticfiles
+
 # Переключаемся на пользователя без прав root
 USER app
 
-# Создаем папку для собранной статики с правильными правами владельца
-# Это КРИТИЧНО, т.к. collectstatic попытается создать её и написать туда файлы.
-# Без этой папки (и без прав на её создание) collectstatic упадет с PermissionError.
-RUN mkdir -p /home/app/web/staticfiles
 
 # Собираем статику
 # Используем dummy ключ, так как .env файла нет на этапе сборки
