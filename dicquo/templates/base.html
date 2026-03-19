@@ -19,6 +19,7 @@
   {# Favicons #}<link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}"/>
   {# Technical Meta #}<meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% endblock %}"/>
+  {# Для ИИ #}<link rel="help" type="text/markdown" href="/llms.txt"/>
   {# CSS #}<link rel="stylesheet" href="{% static 'css/dicquo.css' %}"/>
   <noscript><style>body { opacity: 1; }</style></noscript>{# Показать все если JS не поддерживатся #}
   {% block ExtraHead %}{# Если нужно что=то добавить в `<head>` #}{% endblock %}
