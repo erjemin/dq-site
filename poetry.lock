@@ -128,13 +128,13 @@ Django = ">=4.1"
 
 [[package]]
 name = "etpgrf"
-version = "0.1.4"
+version = "0.1.6"
 description = "Electro-Typographer: Python library for advanced web typography (non-breaking spaces, hyphenation, hanging punctuation and ."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "etpgrf-0.1.4-py3-none-any.whl", hash = "sha256:62d4371e1b5fab06b99f79bd351767aed8baf7d041cae7e5d4eb63f7c9545114"},
-    {file = "etpgrf-0.1.4.tar.gz", hash = "sha256:c699382c292e3110915331dd5539e7dde0c961e4f4ca65cf8db0e01e84dab72f"},
+    {file = "etpgrf-0.1.6-py3-none-any.whl", hash = "sha256:a2d2a67048f094e1d30fe42f05f420afd19babe66ec7daa35b517ca23306d5cc"},
+    {file = "etpgrf-0.1.6.tar.gz", hash = "sha256:a050c400a30be1c2379c892fc5fa398a79d15f0169094f00023a75dec01864af"},
 ]
 
 [package.dependencies]
@@ -675,4 +675,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "b5fca935982220439294d6b37caaf1d893492df96d65abd6389dfd3c9464b992"
+content-hash = "64c804553b6314e8f8f5830637781a3179fd70f14cceb6730bfcb2cf24c91a31"

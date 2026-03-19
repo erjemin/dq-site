@@ -306,12 +306,17 @@ footer button:hover {
 
 /* --- ВЫРАВНИВАНИЕ СИМВОЛОВ ВИСЯЧЕЙ ПУНКТУАЦИИ (Hanging Punctuation) ТИПОГРАФА ETPGRF --- */
 /* --- В ПРОЕКТЕ ТОЛЬКО ЛЕВЫЕ ВИСЯЧИЕ СИМВОЛЫ (выравнивание по левому краю) --- */
-.etp-laquo {margin-left: -0.44em;} /* « */
-.etp-ldquo, .etp-bdquo { margin-left: -0.4em;} /* “ „ */
-.etp-lsquo {margin-left: -0.22em;} /* ‘ */
-.etp-lpar, .etp-lsqb, .etp-lcub {margin-left: -0.25em;}/* ( [ { */
+.etp-laquo { margin-left: -0.49em; }            /* « */
+.etp-ldquo, .etp-bdquo { margin-left: -0.4em; } /* “ “ */
+.etp-lsquo { margin-left: -0.22em; }            /* ’ */
+.etp-lpar, .etp-lsqb, .etp-lcub { margin-left: -0.23em; } /* ( [ { */
+/* компенсирующие пробелы для левых висячих символов */
+.etp-sp-laquo { padding-right: 0.49em; }
+.etp-sp-ldquo, .etp-sp-bdquo { padding-right: 0.4em; }
+.etp-sp-lsquo { padding-right: 0.22em; }
+.etp-sp-lpar, .etp-sp-lsqb, .etp-sp-lcub { padding-right: 0.23em; }
 
-/* --- СЧЕТЧИКИ (СКРЫТЫЙ ПИКСЕЛЬ) --- */
+/* --- СЧЕТЧИКИ (СКРЫТЫЙ ПИКСЕЛЬ) top.mail.ru и Яндекс.Метрика --- */
 .counter-pixel {
   border: 0;
   position: absolute;
