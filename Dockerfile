@@ -44,6 +44,7 @@ ENV DJANGO_SETTINGS_MODULE=dicquo.settings
 # Пакеты -dev и build-essential здесь не нужны.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg62-turbo \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаем пользователя без прав root для безопасности
