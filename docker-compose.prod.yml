@@ -67,7 +67,10 @@ services:
       # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
       - ./config:/nginx_configs_host
 
-    # 6. Переменные окружения
+    # 6. Запускать от имени пользователя с UID 1000 и GID 1000
+    user: "1000:1000"
+
+    # 7. Переменные окружения
     env_file:
       - .env
     environment:
@@ -76,7 +79,7 @@ services:
       # Передаем переменную с путем на хосте внутрь контейнера, чтобы sed мог её использовать
       - HOST_PROJECT_PATH=${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}
 
-    # 7. Проверка здоровья контейнера (Healthcheck)
+    # 8. Проверка здоровья контейнера (Healthcheck)
     # Docker будет периодически проверять статус контейнера. Это критично для Watchtower!
     # Если контейнер объявлен "unhealthy", Watchtower сначала остановит старый образ, потом запустит новый.
     healthcheck:
@@ -86,14 +89,14 @@ services:
       start_period: 10s    # Даем 10 секунд на стартап перед первой проверкой
       retries: 3           # Unhealthy после 3 неудачных попыток
 
-    # 8. Логирование (Ротация)
+    # 9. Логирование (Ротация)
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
 
-    # 9. Ресурсы
+    # 10. Ресурсы
     deploy:
       resources:
         limits:

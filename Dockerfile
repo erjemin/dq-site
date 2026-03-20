@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаем пользователя без прав root для безопасности
-RUN addgroup --system app && adduser --system --ingroup app app
+# RUN addgroup --system app && adduser --system --ingroup app app
 
 # Создаем рабочую директорию
 WORKDIR /home/app/web
@@ -60,24 +60,25 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Копируем исходный код проекта и устанавливаем правильного владельца
-COPY --chown=app:app . .
+# ИЗМЕНЕНИЕ: app:app -> 1000:1000
+COPY --chown=1000:1000 . .
 
 # Создаём директорию для конфигов nginx и даём права пользователю app
 # Это выполняется ещё от root, поэтому проблем с permissions не будет.
-RUN mkdir -p /nginx_configs_host/nginx && chown -R app:app /nginx_configs_host
+RUN mkdir -p /nginx_configs_host/nginx && chown -R 1000:1000 /nginx_configs_host
 
 # Создаём директорию для собранной статики и даём права пользователю app
-RUN mkdir -p /home/app/web/staticfiles && chown -R app:app /home/app/web/staticfiles
+RUN mkdir -p /home/app/web/staticfiles && chown -R 1000:1000 /home/app/web/staticfiles
 
 # Создаём директорию для ошибок (404, 500) и даём права пользователю app
-RUN mkdir -p /app/public/media/errors && chown -R app:app /app/public/media
+RUN mkdir -p /app/public/media/errors && chown -R 1000:1000 /app/public/media
 
 # Создаём директорию для БД и даём права пользователю app
 # Это важно когда БД монтируется как том с хоста
-RUN mkdir -p /app/database && chown -R app:app /app/database
+RUN mkdir -p /app/database && chown -R 1000:1000 /app/database
 
 # Переключаемся на пользователя без прав root
-USER app
+USER 1000
 
 
 # Собираем статику
