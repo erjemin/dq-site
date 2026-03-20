@@ -262,8 +262,17 @@ cython_debug/
 public/media/*
 !public/media/README.md
 
-# OS specific
+# OS specific (Synology DSM)
 .DS_Store
 
 # Data Backup
 database/data.json
+
+# База данных SQLite
+# Никогда не копировать локальную базу в образ!
+db.sqlite3
+db.sqlite3-journal
+db.sqlite3-shm
+db.sqlite3-wal
+*.sqlite3
+*.sqlite3-journal
