@@ -81,8 +81,10 @@ DATABASES = {
         'NAME': BASE_DIR.parent / 'database/db.sqlite3',
         'OPTIONS': {
             # Таймаут ожидания блокировки SQLite (в секундах)
-            # При сложных операциях (например, каскадное удаление тегов) нужно больше времени
-            'timeout': 20,
+            # ВАЖНО: Увеличен до 60 сек для работы с несколькими воркерами Gunicorn
+            'timeout': 60,
+            # Дополнительные опции для лучшей работы SQLite при concurrent доступе
+            'init_command': "PRAGMA journal_mode=WAL;",  # Write-Ahead Logging для лучшей concurrency
         },
     }
 }
