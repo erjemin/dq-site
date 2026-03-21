@@ -210,6 +210,7 @@ class AdmDictumAndQuotesAdmin(admin.ModelAdmin):
         ('Настройки типографа (Etpgrf)', {
             'classes': ('collapse',),
             'fields': (
+                ('bTypograph',),
                 ('etp_language', 'etp_mode'),
                 ('etp_quotes', 'etp_sanitize'),
                 ('etp_hyphenation', 'etp_hanging_punctuation'),
@@ -222,7 +223,7 @@ class AdmDictumAndQuotesAdmin(admin.ModelAdmin):
         }),
         ('Служебное', {
              'classes': ('collapse',),
-             'fields': ('iViewCounter', 'imFileOG', 'bTypograph') # bTypograph kept for compatibility
+             'fields': ('iViewCounter', 'imFileOG', ) # bTypograph kept for compatibility
         })
     )
     readonly_fields = ('szIntroHTML', 'szContentHTML', 'iViewCounter')
