@@ -60,7 +60,8 @@ jobs:
           push: true
           # Собираем под текущую архитектуру (linux/amd64).
           # Если сервер и MacMini на разных архитектурах (x86 vs ARM), добавьте нужные, например: linux/amd64,linux/arm64
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # ДОБАВЛЕНО:
