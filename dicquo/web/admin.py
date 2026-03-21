@@ -8,6 +8,7 @@ from taggit.models import Tag
 from taggit.utils import parse_tags
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
+from django.utils.functional import lazy
 
 try:
     from etpgrf.typograph import Typographer
@@ -35,13 +36,35 @@ class TagSelect2Widget(Select2TagWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Определяем функцию, которая будет выполнена лениво.
+        def get_choices_safely():
+            try:
+                # list() материализует ленивый QuerySet, что важно для lazy()
+                return list(Tag.objects.values_list('name', 'name'))
+            except (OperationalError, ProgrammingError):
+                # Если таблицы нет (например, при collectstatic), возвращаем пустой список.
+                return []
+        # lazy() не выполняет функцию сразу, а создает "обещание" (promise),
+        lazy_safe_choices = lazy(get_choices_safely, list)
         # choices: список всех существующих тегов по имени.
-        # Важно: на этапах вроде collectstatic таблицы taggit ещё может не быть,
-        # поэтому оборачиваем в try/except и молча игнорируем отсутствие БД.
-        try:
-            self.choices = [(t.name, t.name) for t in Tag.objects.all()]
-        except (OperationalError, ProgrammingError):
-            self.choices = []
+        # Присваиваем ему ленивый объект.
+        self.choices = lazy_safe_choices()
+
+    # @property
+    # def choices(self):
+    #     # Этот код будет выполняться только тогда,
+    #     # когда Django реально запросит self.choices для отрисовки.
+    #     # К этому моменту приложение будет полностью готово.
+    #     try:
+    #         self.choices = [(t.name, t.name) for t in Tag.objects.all()]
+    #     except (OperationalError, ProgrammingError):
+    #         self.choices = []
+    #
+    # # Важно: Нам нужно установить setter, даже если он пустой,
+    # # потому что родительский класс будет пытаться присвоить ему значение.
+    # @choices.setter
+    # def choices(self, value):
+    #     pass
 
     class Media:
         css = {
@@ -135,7 +158,7 @@ class DictumAdminForm(forms.ModelForm):
     )
     etp_hanging_punctuation = forms.ChoiceField(
         label="Висячая пунктуация",
-        choices=[('no', 'Нет'), ('left', 'Слева'), ('right', 'Справа'), ('both', 'Обе стороны')],
+        choices=[('no', 'Нет'), ('left', 'Слева'), ('right', 'Справа'), ],
         initial='left',
         required=False,
         help_text="Выносить кавычки за границу текстового блока"
@@ -144,7 +167,7 @@ class DictumAdminForm(forms.ModelForm):
         label="Переносы",
         initial=True,
         required=False,
-        help_text="Расставлять мягкие переносы (&amp;shy;)"
+        help_text="Расставлять мягкие переносы (<tt>&amp;shy;</tt>)"
     )
     etp_sanitize = forms.BooleanField(
         label="Санитайзер (HTML)",
