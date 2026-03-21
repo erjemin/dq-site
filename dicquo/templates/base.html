@@ -12,10 +12,10 @@
   <meta property="og:title" content="{% block OgTitle %}{{ DQ.szContent|truncatechars:85 }}{% endblock %}"/>
   <meta property="og:description" content="{% block OgDescription %}{{ DQ.szIntro|default:'' }} {{ DQ.szContent }} {{ AUTHOR.szAuthor|default:'' }}{% endblock %}"/>
   <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
-  <meta property="og:site_name" content="DicQuo"/>
-  {% if IMAGE %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}"/>{% endif %}
+  <meta property="og:site_name" content="DicQuo"/>{% if IMAGE %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}"/>{% endif %}
   {# Шутка #}<meta name="generator" content="Microsoft FrontPage 1.0"/>
-  {# Canonical #}<link rel="canonical" href="{{ request.build_absolute_uri }}"/>
+  {# Canonical #}{% if DQ and DQ_SLUG %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/{{ DQ.id }}_{{ DQ_SLUG }}"/>{% else %}<link rel="canonical" href="{{ request.build_absolute_uri }}"/>{% endif %}
   {# Favicons #}<link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}"/>
   {# Technical Meta #}<meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% endblock %}"/>

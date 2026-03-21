@@ -79,6 +79,8 @@ class CommonContextMixin:
             request.session['seen_ids'] = seen_ids
 
         context.update({'DQ': dq})
+        # slag текущей цитаты
+        context.update({"DQ_SLUG": pytils.translit.slugify(dq.szContent.lower()[:120])})
 
         # --- 3. АВТОР И ТЕГИ ---
         try:
