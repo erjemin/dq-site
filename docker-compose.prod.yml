@@ -64,7 +64,7 @@ services:
       - ./database:/home/app/web/database
 
       # Медиа (папка media должна быть рядом с docker-compose.yml)
-      - ./media:/app/public/media
+      - ./media:/home/app/web/public/media
 
       # Конфиги (Монтируем папку ./config с хоста в /nginx_configs_host внутри контейнера)
       # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
