@@ -29,6 +29,9 @@ COPY pyproject.toml poetry.lock /app/
 # Устанавливаем зависимости проекта. Poetry установит их в /usr/local/lib/python3.12/site-packages
 RUN poetry install --no-interaction --no-ansi --no-root --only main
 
+# Очищаем кэш Poetry, чтобы уменьшить размер слоя
+RUN poetry cache clear --all -n
+
 
 # =================================================
 # STAGE 2: Final - Создание чистого и безопасного образа
