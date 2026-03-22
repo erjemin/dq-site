@@ -302,6 +302,12 @@ footer button:hover {
   main > article > div > div > div > img {
     height: 36vmax;
   }
+
+ /* Для мобильных путь иконка будет поменьше и поскромнее */
+  header > #logo a > img {
+    width:25px;
+    height:23px;
+  }
 }
 
 /* --- ВЫРАВНИВАНИЕ СИМВОЛОВ ВИСЯЧЕЙ ПУНКТУАЦИИ (Hanging Punctuation) ТИПОГРАФА ETPGRF --- */
