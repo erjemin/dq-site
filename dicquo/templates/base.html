@@ -16,8 +16,12 @@
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ IMAGE.url }}"/>{% endif %}
   {# Шутка #}<meta name="generator" content="Microsoft FrontPage 1.0"/>
   {# Canonical #}{% if DQ and DQ_SLUG %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/{{ DQ.id }}_{{ DQ_SLUG }}"/>{% else %}<link rel="canonical" href="{{ request.build_absolute_uri }}"/>{% endif %}
-  {# Favicons #}<link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
-  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}"/>
+  {# Favicons #}<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  {# Favicons #}<link rel="icon" type="image/png" href="/favicon.png"/>
+  {# Favicons #}<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  {# Favicons #}<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+  {# Favicons #}<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  {# Favicons #}<link rel="manifest" href="/site.webmanifest" />
   {# Technical Meta #}<meta http-equiv="Last-Modified" content="{% block Last4Meta %}{% endblock %}"/>
   {# Для ИИ #}<link rel="help" type="text/markdown" href="/llms.txt"/>
   {# CSS #}<link rel="stylesheet" href="{% static 'css/dicquo.css' %}"/>
