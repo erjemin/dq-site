@@ -48,7 +48,7 @@ services:
              mkdir -p /app/public/media/errors &&
              cp /home/app/web/dicquo/templates/static_404.html /app/public/media/errors/404.html &&
              cp /home/app/web/dicquo/templates/static_500.html /app/public/media/errors/500.html &&
-             gunicorn --workers 3 --bind 0.0.0.0:8000 dicquo.wsgi:application"
+             gunicorn --workers 2  --timeout 15 --bind 0.0.0.0:8000 dicquo.wsgi:application"
 
     # 4. Проброс портов (Внешний Nginx -> localhost:8010)
     ports:
@@ -91,9 +91,9 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()"]
       interval: 30s        # Проверка каждые 30 секунд
-      timeout: 3s          # Таймаут ответа - 3 секунды
-      start_period: 10s    # Даем 10 секунд на стартап перед первой проверкой
-      retries: 3           # Unhealthy после 3 неудачных попыток
+      timeout: 5s          # Таймаут ответа - 5 секунд
+      start_period: 60s    # Даем 60 секунд на стартап (миграции + collectstatic + gunicorn запуск)
+      retries: 5           # Unhealthy после 5 неудачных попыток
 
     # 9. Логирование (Ротация)
     logging:
