@@ -16,8 +16,8 @@ services:
 
     # 1. ОБРАЗ
     # В продакшене мы используем готовый, собранный образ из реестра (Gitea)
-    image: git.cube2.ru/erjemin/2020-dq:v1.0.7
-    # image: git.cube2.ru/erjemin/2020-dq:latest
+    # image: git.cube2.ru/erjemin/2020-dq:v1.0.7
+    image: git.cube2.ru/erjemin/2020-dq:latest
     # Если образа в gitae нет, то перенести весь код в прод и можно собирать локально:
     # build: .
 
