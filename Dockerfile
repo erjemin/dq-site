@@ -98,8 +98,8 @@ EXPOSE 8000
 #   --timeout=3s      - ожидаем ответ максимум 3 секунды
 #   --start-period=10s - даем контейнеру 10 секунд на запуск перед первой проверкой
 #   --retries=3       - объявляем контейнер unhealthy после 3 неудачных попыток
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()" || exit 1
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+#   CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()" || exit 1
 
 # Переходим в директорию с manage.py для корректного запуска gunicorn
 WORKDIR /home/app/web/dicquo
