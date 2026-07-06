@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import DetailView, TemplateView
 import time
 import pytils
+import random
 from web.models import TbDictumAndQuotes, TbImages, TbAuthor
 
 
@@ -98,9 +99,11 @@ class CommonContextMixin:
         # --- 4. ВЫБОР КАРТИНКИ ---
         if dq.kImages_id is None:
             if len(tags) != 0:
-                tagged_image = TbImages.objects.filter(tags__name__in=tags).order_by('?').first()
-                if tagged_image:
-                    context.update({'IMAGE': tagged_image.imFile})
+                # Используем Python random вместо order_by('?') для производительности
+                tagged_images = list(TbImages.objects.filter(tags__name__in=tags).values_list('id', 'imFile'))
+                if tagged_images:
+                    tagged_image = tagged_images[random.randint(0, len(tagged_images) - 1)]
+                    context.update({'IMAGE': tagged_image[1]})
         else:
             context.update({'IMAGE': dq.kImages.imFile})
 
@@ -110,7 +113,13 @@ class CommonContextMixin:
 
         # --- 6. ВЫБОР СЛЕДУЮЩЕЙ ЦИТАТЫ ---
         # Сначала пробуем найти следующую цитату, которую мы еще не видели
-        dq_next = queryset.exclude(id__in=seen_ids).order_by('?').first()
+        # Используем Python random вместо order_by('?') для производительности
+        unseen_ids = queryset.exclude(id__in=seen_ids).values_list('id', flat=True)
+        if unseen_ids:
+            dq_next_id = list(unseen_ids)[random.randint(0, len(unseen_ids) - 1)]
+            dq_next = queryset.filter(id=dq_next_id).first()
+        else:
+            dq_next = None
 
         # Если таких нет (мы посмотрели все цитаты в этом контексте/теге)
         if dq_next is None:
@@ -123,7 +132,12 @@ class CommonContextMixin:
             # Вариант: Очистить seen_ids, чтобы в следующий раз (на некст странице) список был пуст?
             # Или просто выбрать любую КРОМЕ текущей?
 
-            dq_next = queryset.exclude(id=dq.id).order_by('?').first()
+            other_ids = list(queryset.exclude(id=dq.id).values_list('id', flat=True))
+            if other_ids:
+                dq_next_id = other_ids[random.randint(0, len(other_ids) - 1)]
+                dq_next = queryset.filter(id=dq_next_id).first()
+            else:
+                dq_next = None
 
             # Если мы действительно прошли весь цикл по тегу, логично сбросить seen_ids,
             # чтобы пользователь мог заново проходить этот список случайно, а не "застревать" на последних.
@@ -200,13 +214,19 @@ class IndexView(CommonContextMixin, TemplateView):
 
         if active_qs is not None:
              # Если мы в режиме фильтрации, тоже стараемся не показывать то, что уже видели
-             dq = active_qs.exclude(id__in=seen_ids).order_by('?').first()
+             unseen_ids = list(active_qs.exclude(id__in=seen_ids).values_list('id', flat=True))
+             if unseen_ids:
+                 dq = active_qs.filter(id=unseen_ids[random.randint(0, len(unseen_ids) - 1)]).first()
+             else:
+                 dq = None
 
              # Если после фильтрации ничего не осталось (мы просмотрели все цитаты тега)
              if dq is None:
                  # Сбрасываем историю и берем любую
                  self.request.session['seen_ids'] = []
-                 dq = active_qs.order_by('?').first()
+                 all_ids = list(active_qs.values_list('id', flat=True))
+                 if all_ids:
+                     dq = active_qs.filter(id=all_ids[random.randint(0, len(all_ids) - 1)]).first()
 
         if dq is None:
             # Если тег не задан, или по тегу ничего не нашлось совсем
@@ -214,11 +234,14 @@ class IndexView(CommonContextMixin, TemplateView):
             active_qs = TbDictumAndQuotes.objects.all()
 
             # Случайная цитата (с учетом истории, чтобы главная страница тоже не зацикливалась)
-            dq = active_qs.exclude(id__in=seen_ids).order_by('?').first()
-
-            if dq is None:
+            unseen_ids = list(active_qs.exclude(id__in=seen_ids).values_list('id', flat=True))
+            if unseen_ids:
+                dq = active_qs.filter(id=unseen_ids[random.randint(0, len(unseen_ids) - 1)]).first()
+            else:
                 self.request.session['seen_ids'] = []
-                dq = active_qs.order_by('?').first()
+                all_ids = list(active_qs.values_list('id', flat=True))
+                if all_ids:
+                    dq = active_qs.filter(id=all_ids[random.randint(0, len(all_ids) - 1)]).first()
 
         if dq:
              # Используем миксин, ОБЯЗАТЕЛЬНО передаем active_qs
