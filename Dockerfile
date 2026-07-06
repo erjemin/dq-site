@@ -104,5 +104,5 @@ EXPOSE 8000
 # Переходим в директорию с manage.py для корректного запуска gunicorn
 WORKDIR /home/app/web/dicquo
 
-# Команда запуска
-CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "dicquo.wsgi:application"]
+# Команда запуска (не обязательная, так как в docker-compose.yml указана своя команда)
+# CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8010", "dicquo.wsgi:application"]
