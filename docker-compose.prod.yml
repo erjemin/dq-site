@@ -16,7 +16,8 @@ services:
 
     # 1. ОБРАЗ
     # В продакшене мы используем готовый, собранный образ из реестра (Gitea)
-    image: git.cube2.ru/erjemin/2020-dq:latest
+    image: git.cube2.ru/erjemin/2020-dq:v1.0.7
+    # image: git.cube2.ru/erjemin/2020-dq:latest
     # Если образа в gitae нет, то перенести весь код в прод и можно собирать локально:
     # build: .
 
@@ -28,14 +29,13 @@ services:
 
     # 3. КОМАНДА ЗАПУСКА (Замена entrypoint.sh)
     # Выполняем цепочку команд внутри контейнера при запуске:
-    #    a. Миграции
-    #    b. Collectstatic
-    #    с. Создаем папку nginx в примонтированном томе конфигов (если нет)
-    #    d. Копирование конфига Nginx с авто-заменой путей через sed (замену реального пути на хосте получаем
-    #       через переменную окружения HOST_PROJECT_PATH)
-    #    e. Инициализация боевого конфига (если нет)
-    #    f. Создаем папку для ошибок и копируем туда статические страницы 404/500 (там их увидит Nginx хоста)
-    #    g. Запуск Gunicorn
+    # 1. Миграции
+    # 2. Collectstatic
+    # 3. Создаем папку nginx в примонтированном томе конфигов (если нет)
+    # 4. Копирование конфига Nginx с авто-заменой путей через sed (замену реального пути на хосте получаем через переменную окружения HOST_PROJECT_PATH)
+    # 5. Инициализация боевого конфига (если нет)
+    # 6. Создаем папку для ошибок и копируем туда статические страницы 404/500
+    # 7. Запуск Gunicorn
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
@@ -48,12 +48,12 @@ services:
              mkdir -p /app/public/media/errors &&
              cp /home/app/web/dicquo/templates/static_404.html /app/public/media/errors/404.html &&
              cp /home/app/web/dicquo/templates/static_500.html /app/public/media/errors/500.html &&
-             gunicorn --workers 3 --bind 0.0.0.0:8000 dicquo.wsgi:application"
+             gunicorn --workers 2 --timeout 120 --bind 0.0.0.0:8010 dicquo.wsgi:application"
 
     # 4. Проброс портов (Внешний Nginx -> localhost:8010)
     ports:
       # Слушаем только на localhost хоста, чтобы закрыть прямой доступ из интернета к Gunicorn
-      - "127.0.0.1:8010:8000"
+      - "127.0.0.1:8010:8010"
 
     # 5. Тома (Volumes)
     volumes:
@@ -69,14 +69,16 @@ services:
       # Это нужно, чтобы скрипт запуска мог положить туда .example конфиг и прочитать боевой конфиг.
       - ./config:/nginx_configs_host
 
-    # 6. Пользователь и права
+    # 6.
     user: "1000:1000"
 
-    # Когда нужна отладка процессов внутри контейнера, можно временно раскомментировать эту строку и запустить контейнер с правами root.
-    # cap_add:
-    #   - SYS_PTRACE
+    # Для отладки
+    cap_add:
+      - SYS_PTRACE
 
-    # 7. Переменные окружения
+
+
+    # 6. Переменные окружения
     env_file:
       - .env
     environment:
@@ -85,30 +87,31 @@ services:
       # Передаем переменную с путем на хосте внутрь контейнера, чтобы sed мог её использовать
       - HOST_PROJECT_PATH=${HOST_PROJECT_PATH:-/home/default_user/projects/dq-site}
 
-    # 8. Проверка здоровья контейнера (Healthcheck)
+    # 7. Проверка здоровья контейнера (Healthcheck)
     # Docker будет периодически проверять статус контейнера. Это критично для Watchtower!
     # Если контейнер объявлен "unhealthy", Watchtower сначала остановит старый образ, потом запустит новый.
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()"]
-      interval: 30s        # Проверка каждые 30 секунд
-      timeout: 3s          # Таймаут ответа - 3 секунды
-      start_period: 10s    # Даем 10 секунд на стартап перед первой проверкой
-      retries: 3           # Unhealthy после 3 неудачных попыток
+    # healthcheck:
+    #   # test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/').read()"]
+    #   test: ["CMD", "test", "-f", "/home/app/web/dicquo/gunicorn.ctl"]
+    #   interval: 300s        # Проверка каждые 300 секунд
+    #   timeout: 30s          # Таймаут ответа - 30 секунды
+    #   start_period: 80s    # Даем 30 секунд на стартап перед первой проверкой
+    #   retries: 3           # Unhealthy после 3 неудачных попыток
 
-    # 9. Логирование (Ротация)
+    # 8. Логирование (Ротация)
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
-        max-file: "3"
+        max-file: "2"
 
-    # 10. Ресурсы
+    # 9. Ресурсы
     deploy:
       resources:
         limits:
-          cpus: '0.40'
-          memory: 256M
-    mem_limit: 256m
+          cpus: '0.50'
+          memory: 380M
+    mem_limit: 380M
 
   # --- WATCHTOWER: АВТО-ОБНОВЛЕНИЕ ОБРАЗОВ ---
   # Следит за реестром Gitea и обновляет контейнер web, если появился новый image
@@ -133,5 +136,5 @@ services:
     logging:
         driver: "json-file"
         options:
-          max-size: "10m"
-          max-file: "3"
+          max-size: "1m"
+          max-file: "1"
